@@ -1,0 +1,111 @@
+{{ block "index" . }}
+<!DOCTYPE html>
+<head>
+  <title>LSTS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+  />
+  <script
+    src="https://unpkg.com/htmx.org@2.0.3"
+    integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+    crossorigin="anonymous"
+  ></script>
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"
+  ></script>
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+  ></script>
+  <script src="/js/script.js" defer></script>
+</head>
+<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
+  {{ template "heading" .}}
+
+  <main>
+    <div class="main-container">
+      <div class="gift-cap gift-cap-opened">
+        <div class="gift-tape-2"></div>
+        <div class="gift-tape-1"></div>
+        <div class="gift-cap-base"></div>
+        <div class="gift-cap-tape"></div>
+      </div>
+      <div class="list-container">
+        <form hx-post="/wishlist" hx-on::after-request="onFormSubmit()">
+          <div class="list-inputs">
+            <template x-for="(input, index) in inputs" :key="index">
+              <div class="input-row">
+                <span x-text="(index + 1) + '.'"> </span>
+                <div class="input-container">
+                  <input
+                    x-model="inputs[index]"
+                    x-on:input="resizeInput($event)"
+                    x-on:keydown.enter.prevent="addInput()"
+                    x-on:keydown.backspace="updateInput(index)"
+                    type="text"
+                    placeholder="Add item"
+                  />
+                </div>
+              </div>
+            </template>
+          </div>
+          <button
+            class="secondary"
+            x-bind:disabled="items.length === 0"
+            id="share"
+            type="submit"
+          >
+            Create
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script>
+    const listContainer = document.getElementsByClassName("list-container")[0];
+    const capDiv = document.getElementsByClassName("gift-cap")[0];
+
+    function wishlistData() {
+      return {
+        items: [],
+        inputs: [""],
+        isDarkMode: Alpine.$persist(false),
+        addInput() {
+          this.inputs.push("");
+        },
+        updateInput(index) {
+          if (this.inputs[index].trim() === "") {
+            this.inputs.splice(index, 1);
+          }
+        },
+        resizeInput(event) {
+          const input = event.target;
+          const textWidth = input.offsetWidth;
+          const maxWidth = Math.max(...Object.values(this.inputs).map(v => v.length)) * 12;
+          const targetWidth = Math.min(Math.max(maxWidth + 140, 250), 400);
+          console.log(targetWidth);
+          listContainer.style.width = `${targetWidth}px`;
+          capDiv.style.width = `${(targetWidth + 70)}px`;
+        },
+        toggleTheme() {
+          this.darkMode = !this.darkMode;
+        },
+      };
+    }
+  </script>
+</body>
+
+{{ end }} {{ block "wishlist-preview" . }} {{ range .Items }}
+<p>#{{ .Index }} {{ .Text }}</p>
+{{ end }}
+<button onclick="editList()" id="edit" class="secondary">Edit</button>
+<a href="/wishlist/{{ .Id }}" target="_blank" role="button" class="secondary"
+  >View</a
+>
+{{ end }}

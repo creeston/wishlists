@@ -1,0 +1,39 @@
+{{ block "wishlist" . }}
+<!DOCTYPE html>
+<head>
+  <title>LSTS</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+  />
+  <script
+    src="https://unpkg.com/htmx.org@2.0.3"
+    integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+    crossorigin="anonymous"
+  ></script>
+</head>
+<body>
+  {{ template "heading" .}}
+
+  <main>
+    <div class="main-container">
+      <div class="gift-cap">
+        <div class="gift-tape-2"></div>
+        <div class="gift-tape-1"></div>
+        <div class="gift-cap-base"></div>
+        <div class="gift-cap-tape"></div>
+      </div>
+      <div class="list-container">
+        {{ range .Items }}
+          <p>#{{ .Index }} {{ .Text }}</p>
+        {{ end }}
+      </div>
+    </div>
+  </main>
+</body>
+
+{{ end }}

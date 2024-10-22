@@ -1,23 +1,8 @@
 {{ block "wishlist" . }}
 <!DOCTYPE html>
-<head>
-  <title>LSTS</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  />
-  <script
-    src="https://unpkg.com/htmx.org@2.0.3"
-    integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
-    crossorigin="anonymous"
-  ></script>
-</head>
-<body>
-  {{ template "heading" .}}
+{{ template "heading" .}}
+<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
+  {{ template "top-bar" .}}
 
   <main>
     <div class="main-container">
@@ -29,11 +14,22 @@
       </div>
       <div class="list-container">
         {{ range .Items }}
-          <p>#{{ .Index }} {{ .Text }}</p>
+        <p>{{ .Index }}. {{ .Text }}</p>
         {{ end }}
       </div>
     </div>
   </main>
 </body>
+
+<script>
+  function wishlistData() {
+    return {
+      isDarkMode: Alpine.$persist(false),
+      toggleTheme() {
+        this.darkMode = !this.darkMode;
+      },
+    };
+  }
+</script>
 
 {{ end }}

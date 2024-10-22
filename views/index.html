@@ -1,111 +1,182 @@
 {{ block "index" . }}
 <!DOCTYPE html>
-<head>
-  <title>LSTS</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  />
-  <script
-    src="https://unpkg.com/htmx.org@2.0.3"
-    integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
-    crossorigin="anonymous"
-  ></script>
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"
-  ></script>
-  <script
-    defer
-    src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
-  ></script>
-  <script src="/js/script.js" defer></script>
-</head>
-<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
-  {{ template "heading" .}}
+{{ template "heading" .}}
 
-  <main>
-    <div class="main-container">
-      <div class="gift-cap gift-cap-opened">
-        <div class="gift-tape-2"></div>
-        <div class="gift-tape-1"></div>
-        <div class="gift-cap-base"></div>
-        <div class="gift-cap-tape"></div>
-      </div>
-      <div class="list-container">
-        <form hx-post="/wishlist" hx-on::after-request="onFormSubmit()">
-          <div class="list-inputs">
-            <template x-for="(input, index) in inputs" :key="index">
-              <div class="input-row">
-                <span x-text="(index + 1) + '.'"> </span>
-                <div class="input-container">
-                  <input
-                    x-model="inputs[index]"
-                    x-on:input="resizeInput($event)"
-                    x-on:keydown.enter.prevent="addInput()"
-                    x-on:keydown.backspace="updateInput(index)"
-                    type="text"
-                    placeholder="Add item"
-                  />
-                </div>
-              </div>
-            </template>
-          </div>
-          <button
-            class="secondary"
-            x-bind:disabled="items.length === 0"
-            id="share"
-            type="submit"
-          >
-            Create
-          </button>
-        </form>
-      </div>
+<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
+  {{ template "top-bar" .}}
+  <div class="main-container">
+    <div class="gift-cap gift-cap-opened" x-on:click="toggleForm()">
+      <div class="gift-tape-2"></div>
+      <div class="gift-tape-1"></div>
+      <div class="gift-cap-base"></div>
+      <div class="gift-cap-tape"></div>
     </div>
-  </main>
+    <div class="list-container">{{ template "wishlist-form" .}}</div>
+  </div>
   <script>
     const listContainer = document.getElementsByClassName("list-container")[0];
     const capDiv = document.getElementsByClassName("gift-cap")[0];
 
     function wishlistData() {
       return {
-        items: [],
-        inputs: [""],
         isDarkMode: Alpine.$persist(false),
-        addInput() {
-          this.inputs.push("");
-        },
-        updateInput(index) {
-          if (this.inputs[index].trim() === "") {
-            this.inputs.splice(index, 1);
-          }
-        },
-        resizeInput(event) {
-          const input = event.target;
-          const textWidth = input.offsetWidth;
-          const maxWidth = Math.max(...Object.values(this.inputs).map(v => v.length)) * 12;
-          const targetWidth = Math.min(Math.max(maxWidth + 140, 250), 400);
-          console.log(targetWidth);
-          listContainer.style.width = `${targetWidth}px`;
-          capDiv.style.width = `${(targetWidth + 70)}px`;
-        },
         toggleTheme() {
           this.darkMode = !this.darkMode;
         },
+        setFormAsCreating() {
+          this.isCreating = true;
+          capDiv.classList.add("gift-cap-opened");
+        },
+        isCreating: true,
+        toggleForm() {
+          capDiv.classList.remove("gift-cap-opened");
+          const form = document.querySelector("form");
+          form.requestSubmit();
+        },
+        onFormReopen() {
+          capDiv.classList.add("gift-cap-opened");
+        },
+        onFormSubmit() {
+          capDiv.classList.remove("gift-cap-opened");
+        },
+
       };
     }
   </script>
 </body>
-
-{{ end }} {{ block "wishlist-preview" . }} {{ range .Items }}
-<p>#{{ .Index }} {{ .Text }}</p>
 {{ end }}
-<button onclick="editList()" id="edit" class="secondary">Edit</button>
-<a href="/wishlist/{{ .Id }}" target="_blank" role="button" class="secondary"
-  >View</a
+
+
+{{ block "wishlist-form" . }}
+<form 
+  x-data="wishlistFormData()"
+  {{ if .HasId }}
+  hx-put="/wishlist/{{ .Id }}"
+  {{ else }}
+  hx-post="/wishlist"
+  {{ end }}
+  @htmx:before-request.camel="onFormSubmit()" 
+  hx-swap="outerHTML"
 >
+  <div class="list-inputs" x-init="initializeFormValues()">
+    <template x-for="(input, index) in inputs" :key="index" x-effect="inputs && $nextTick(() => initializeSpanWidths())">
+      <div class="input-row">
+        <span :class="{'invisible': !input}" x-text="(index + 1) + '.'"> </span>
+        <div class="input-container">
+          <input :disabled="!isCreating" :id="'input-' + index" x-model="inputs[index]" x-on:input="resizeInput($event, index)"
+            x-on:keydown.enter.prevent="focusOnNextInputElement(index)"
+            x-on:keydown.backspace="removeIfAlreadyEmpty(index)" :name="'item' + index" type="text"
+            placeholder="Start typing..." />
+          <span :id="'input-hidden-span-' + index" class="hidden-span"></span>
+        </div>
+      </div>
+    </template>
+  </div>
+  {{ if .HasId }}
+    {{ template "wishlist-share-link" . }}
+  {{ end }}
+  <script>
+    function wishlistFormData() {
+      return {
+        inputs: [],
+        inputLengths: [],
+        initializeFormValues() {
+            {{ if .HasItems }}
+              this.inputs = [
+                {{ range .Items }}
+                  "{{ .Text }}",
+                {{ end }}
+              ];
+              this.isCreating = false;
+            {{ else}}
+              this.inputs = [""];
+              this.isCreating = true;
+            {{ end }}
+            this.inputLengths = [0];
+            this.$watch('isCreating', value => { 
+              if (value) {
+                if (this.inputs[-1] !== "") {
+                  this.addInput();
+                }
+              }
+            });
+        },
+        initializeSpanWidths() {
+          for (let i = 0; i < this.inputs.length; i++) {
+            const input = document.getElementById("input-" + i);
+            this.updateInputTextWidth(i, this.inputs[i], input);
+          }
+        },
+        focusOnNextInputElement(index) {
+          const nextInput = document.getElementById("input-" + (index + 1));
+          if (nextInput) {
+            nextInput.focus();
+          }
+        },
+        removeIfAlreadyEmpty(index) {
+          if (this.inputs[index].trim() !== "") {
+            return;
+          }
+    
+          if (index === this.inputs.length - 1) {
+            return;
+          }
+    
+          this.inputs.splice(index, 1);
+        },
+        resizeInput(event, index) {
+          const input = event.target;
+          this.updateInputTextWidth(index, input.value, input);
+          const maxWidth = Math.max(...Object.values(this.inputLengths));
+          const targetWidth = maxWidth + 120;
+          listContainer.style.width = `${targetWidth}px`;
+          capDiv.style.width = `${targetWidth + 70}px`;
+    
+          if (this.inputs[index].trim() === "" && this.inputs.length > 1) {
+            this.inputs.splice(index, 1);
+            this.inputLengths.splice(index, 1);
+          } else if (this.inputs.length === index + 1) {
+            this.addInput();
+          }
+        },
+        updateInputTextWidth(index, value, input) {
+          const hiddenSpan = document.getElementById(
+            "input-hidden-span-" + index
+          );
+          hiddenSpan.textContent = value;
+          const computedStyle = window.getComputedStyle(input);
+          hiddenSpan.style.fontSize = computedStyle.fontSize;
+          hiddenSpan.style.fontFamily = computedStyle.fontFamily;
+          hiddenSpan.style.fontWeight = computedStyle.fontWeight;
+          hiddenSpan.style.letterSpacing = computedStyle.letterSpacing;
+          hiddenSpan.style.textTransform = computedStyle.textTransform;
+          this.inputLengths[index] = hiddenSpan.offsetWidth;
+        },
+        addInput() {
+          this.inputs.push("");
+          this.inputLengths.push(0);
+        },
+        copyToClipboard(text) {
+          navigator.clipboard.writeText(text);
+        },
+      };
+    }
+    </script>
+</form>
+
+{{ end }}
+
+
+{{ block "wishlist-share-link" . }}
+<fieldset role="group" class="wishlist-link">
+  <input type="text" disabled value="http://localhost:1323/wishlist/{{ .Id }}" />
+  <button class="secondary clipboard-button"
+    x-on:click.prevent="copyToClipboard('http://localhost:1323/wishlist/{{ .Id }}')">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="24" height="24" stroke-width="1.5"
+      stroke="currentColor" class="size-6">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+    </svg>
+  </button>
+</fieldset>
 {{ end }}

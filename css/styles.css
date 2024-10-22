@@ -9,16 +9,13 @@ body {
 
 .list-container {
   border: 2px solid rgb(184, 184, 184);
-  padding-top: 25px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 10px;
+  padding-top: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 0px;
   margin: 0px auto;
   z-index: 0;
   border-top: 0px;
-
-  width: 250px;
-  max-width: 400px;
 }
 
 .list-container > h3 {
@@ -68,6 +65,7 @@ body {
 
 .input-row span.invisible {
   color: var(--pico-secondary);
+  opacity: 0.5;
 }
 
 .gift-cap {
@@ -140,8 +138,36 @@ nav li {
   display: none !important;
 }
 
+fieldset.wishlist-link {
+  height: 40px;
+}
 
+fieldset.wishlist-link input {
+  font-size: 14px;
+  height: 40px;
+}
 
-.theme-button {
-  font-size: 13px;
+fieldset.wishlist-link button.clipboard-button {
+  padding: 0px 5px;
+}
+
+.input-container>input {
+  height: 40px;
+}
+
+.hidden-span {
+  visibility: hidden;
+  white-space: pre;
+  position: absolute;
+}
+
+.gift-cap {
+  max-width: 470px;
+  min-width: 320px;
+}
+
+.list-container {
+  width: 250px;
+  min-width: 250px;
+  max-width: 400px;
 }

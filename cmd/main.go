@@ -3,9 +3,11 @@ package main
 import (
 	"html/template"
 	"io"
+	"net/http"
 	"sort"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -29,30 +31,84 @@ type Count struct {
 }
 
 type WishlistItem struct {
-	Text  string
-	Index int
+	Text    string
+	Checked bool
+	Index   int
 }
 
 type Wishlist struct {
-	Items []WishlistItem
-	Id    int
+	Items  []*WishlistItem
+	Id     int
+	UserId string
 }
 
 type WishlistFormData struct {
-	Items    []WishlistItem
+	Items    []WishlistFormItem
 	HasItems bool
 	HasId    bool
 	Id       int
 }
 
-func NewWishlist(items []WishlistItem, id int) Wishlist {
-	return Wishlist{
-		Items: items,
-		Id:    id,
+type WishlistFormItem struct {
+	Index int
+	Text  string
+}
+
+type WishlistViewFormData struct {
+	Items []WishlistCheckedItemData
+	Id    int
+}
+
+type WishlistCheckedItemData struct {
+	Index   int
+	Text    string
+	Id      int
+	Checked bool
+}
+
+func MapWishlistToWishlistFormData(wishlist *Wishlist) WishlistFormData {
+	items := []WishlistFormItem{}
+	for _, item := range wishlist.Items {
+		items = append(items, WishlistFormItem{
+			Index: item.Index,
+			Text:  item.Text,
+		})
+	}
+
+	return WishlistFormData{
+		Items:    items,
+		HasItems: true,
+		HasId:    true,
+		Id:       wishlist.Id,
 	}
 }
 
-type Wishlists = []Wishlist
+func MapWishlistToWishlistViewFormData(wishlist *Wishlist) WishlistViewFormData {
+	items := []WishlistCheckedItemData{}
+	for _, item := range wishlist.Items {
+		items = append(items, WishlistCheckedItemData{
+			Index:   item.Index,
+			Text:    item.Text,
+			Id:      wishlist.Id,
+			Checked: item.Checked,
+		})
+	}
+
+	return WishlistViewFormData{
+		Items: items,
+		Id:    wishlist.Id,
+	}
+}
+
+func NewWishlist(items []*WishlistItem, id int, userId string) *Wishlist {
+	return &Wishlist{
+		Items:  items,
+		Id:     id,
+		UserId: userId,
+	}
+}
+
+type Wishlists = []*Wishlist
 
 type Data struct {
 	Wishlists Wishlists
@@ -74,12 +130,39 @@ func main() {
 		return c.Render(200, "index", WishlistFormData{HasItems: false, HasId: false})
 	})
 
+	data.Wishlists = append(data.Wishlists, NewWishlist(
+		[]*WishlistItem{
+			{Text: "Cake", Index: 0},
+			{Text: "Candles", Index: 1},
+			{Text: "Balloons", Index: 2},
+			{Text: "Presents. A lot a lot a lof a very long list of presents please!", Index: 3},
+		},
+		0,
+		"default"))
+
 	e.POST("/wishlist", func(c echo.Context) error {
-		items := []WishlistItem{}
+		items := []*WishlistItem{}
 		params, error := c.FormParams()
 		if error != nil {
 			return error
 		}
+
+		userId := ""
+		userIdCookie, error := c.Cookie("wishlist_uid")
+		if error != nil {
+			if error != http.ErrNoCookie {
+				return error
+			} else {
+				userId = uuid.New().String()
+			}
+		} else {
+			userId = userIdCookie.Value
+		}
+
+		c.SetCookie(&http.Cookie{
+			Name:  "wishlist_uid",
+			Value: userId,
+		})
 
 		for key, value := range params {
 			if key[:4] != "item" {
@@ -101,7 +184,7 @@ func main() {
 				return error
 			}
 
-			items = append(items, WishlistItem{Text: value[0], Index: index})
+			items = append(items, &WishlistItem{Text: value[0], Index: index})
 		}
 
 		sort.Slice(items, func(i, j int) bool {
@@ -109,19 +192,47 @@ func main() {
 		})
 
 		wishlistId := len(data.Wishlists)
-		wishlist := NewWishlist(items, wishlistId)
+		wishlist := NewWishlist(items, wishlistId, userId)
 		data.Wishlists = append(data.Wishlists, wishlist)
 
-		// redirect to the wishlist page
-		// by setting hx-redirect header in response
-		// c.Response().Header().Set("hx-redirect", "/wishlist/"+strconv.Itoa(wishlistId))
-		// return c.Redirect(302, "/wishlist/"+strconv.Itoa(wishlistId))
-		return c.Render(200, "wishlist-form", WishlistFormData{
-			Items:    items,
-			HasItems: true,
-			HasId:    true,
-			Id:       wishlistId,
-		})
+		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(wishlist))
+	})
+
+	e.PUT("/wishlist/:id/:itemId", func(c echo.Context) error {
+		id, error := strconv.Atoi(c.Param("id"))
+		if error != nil {
+			return error
+		}
+
+		itemId, error := strconv.Atoi(c.Param("itemId"))
+		if error != nil {
+			return error
+		}
+
+		if (id < 0) || (id >= len(data.Wishlists)) {
+			return c.String(404, "Wishlist not found")
+		}
+
+		wishlist := data.Wishlists[id]
+		if (itemId < 0) || (itemId >= len(wishlist.Items)) {
+			return c.String(404, "Item not found")
+		}
+
+		wishlistItem := wishlist.Items[itemId]
+
+		isChecked := c.FormValue(("flag")) == "on"
+		wishlistItem.Checked = isChecked
+		formData := WishlistCheckedItemData{
+			Index: wishlistItem.Index,
+			Text:  wishlistItem.Text,
+			Id:    wishlist.Id,
+		}
+
+		if isChecked {
+			return c.Render(200, "wishlist-checked-item", formData)
+		} else {
+			return c.Render(200, "wishlist-not-checked-item", formData)
+		}
 	})
 
 	e.PUT("/wishlist/:id", func(c echo.Context) error {
@@ -135,7 +246,7 @@ func main() {
 			return c.String(404, "Wishlist not found")
 		}
 
-		items := []WishlistItem{}
+		items := []*WishlistItem{}
 		params, error := c.FormParams()
 		if error != nil {
 			return error
@@ -161,21 +272,18 @@ func main() {
 				return error
 			}
 
-			items = append(items, WishlistItem{Text: value[0], Index: index})
+			items = append(items, &WishlistItem{Text: value[0], Index: index})
 		}
 
 		sort.Slice(items, func(i, j int) bool {
 			return items[i].Index < items[j].Index
 		})
 
+		wishlist := data.Wishlists[id]
+
 		data.Wishlists[id].Items = items
 
-		return c.Render(200, "wishlist-form", WishlistFormData{
-			Items:    items,
-			HasItems: true,
-			HasId:    true,
-			Id:       id,
-		})
+		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(wishlist))
 	})
 
 	e.GET("/wishlist/:id", func(c echo.Context) error {
@@ -185,12 +293,23 @@ func main() {
 		}
 
 		if (id < 0) || (id >= len(data.Wishlists)) {
-			c.Response().Header().Set("hx-redirect", "/")
-			return c.String(404, "Wishlist not found")
+			return c.Render(200, "not-found", nil)
 		}
 
 		wishlist := data.Wishlists[id]
-		return c.Render(200, "wishlist", wishlist)
+		userIdCookie, error := c.Cookie("wishlist_uid")
+		if error != nil {
+			if error == http.ErrNoCookie {
+				return c.Render(200, "wishlist", MapWishlistToWishlistViewFormData(wishlist))
+			}
+			return error
+		}
+
+		if userIdCookie.Value != data.Wishlists[id].UserId {
+			return c.Render(200, "wishlist", MapWishlistToWishlistViewFormData(wishlist))
+		}
+
+		return c.Render(200, "index", MapWishlistToWishlistFormData(wishlist))
 	})
 
 	e.Static("/css", "css")

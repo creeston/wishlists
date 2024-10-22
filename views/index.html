@@ -5,7 +5,7 @@
 <body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
   {{ template "top-bar" .}}
   <div class="main-container">
-    <div class="gift-cap gift-cap-opened" x-on:click="toggleForm()">
+    <div class="gift-cap" x-on:click="toggleForm()" :class="{'gift-cap-opened': isCreating}">
       <div class="gift-tape-2"></div>
       <div class="gift-tape-1"></div>
       <div class="gift-cap-base"></div>

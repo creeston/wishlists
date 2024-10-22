@@ -58,6 +58,10 @@
             const input = document.getElementById("input-" + i);
             this.updateInputTextWidth(i, this.inputs[i], input);
           }
+          const maxWidth = Math.max(...Object.values(this.inputLengths));
+          const targetWidth = maxWidth + 120;
+          listContainer.style.width = `${targetWidth}px`;
+          capDiv.style.width = `${targetWidth + 70}px`;
         },
         focusOnNextInputElement(index) {
           const nextInput = document.getElementById("input-" + (index + 1));

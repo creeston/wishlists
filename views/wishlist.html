@@ -1,6 +1,7 @@
 {{ block "wishlist" . }}
 <!DOCTYPE html>
 {{ template "heading" .}}
+
 <body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
   {{ template "top-bar" .}}
 
@@ -12,24 +13,81 @@
         <div class="gift-cap-base"></div>
         <div class="gift-cap-tape"></div>
       </div>
-      <div class="list-container">
+      <div class="list-container" x-init="initializeSpanWidths()">
         {{ range .Items }}
-        <p>{{ .Index }}. {{ .Text }}</p>
+          {{ if .Checked }}
+            {{ template "wishlist-checked-item" . }}
+          {{ else }}
+            {{ template "wishlist-not-checked-item" . }}
+          {{ end }}
         {{ end }}
       </div>
     </div>
   </main>
 </body>
 
+<style>
+  .checked-text {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+</style>
+
 <script>
+  const capDiv = document.getElementsByClassName("gift-cap")[0];
+  const listContainer = document.getElementsByClassName("list-container")[0];
+  const hiddenSpans = document.getElementsByClassName("hidden-span");
+
   function wishlistData() {
     return {
       isDarkMode: Alpine.$persist(false),
       toggleTheme() {
         this.darkMode = !this.darkMode;
       },
+      initializeSpanWidths() {
+        const inputLengths = [];
+        for (let i = 0; i < hiddenSpans.length; i++) {
+          const span = hiddenSpans[i];
+          const spanWidth = span.offsetWidth;
+          inputLengths.push(spanWidth);
+        }
+
+        const maxWidth = Math.max(...Object.values(inputLengths));
+        const targetWidth = maxWidth + 80;
+        listContainer.style.width = `${targetWidth}px`;
+        capDiv.style.width = `${targetWidth + 70}px`;
+      },
+      submitForm(index) {
+        const form = document.getElementById("form-" + index);
+        form.requestSubmit();
+      },
     };
   }
 </script>
 
+{{ end }}
+
+{{ block "wishlist-not-checked-item" . }}
+  <form hx-put="/wishlist/{{ .Id}}/{{.Index}}" id="form-{{ .Index}}" hx-swap="outerHTML">
+    <label>
+      <input type="checkbox" name="flag" x-on:click.prevent="submitForm({{.Index}})"/>
+      <span>
+        {{ .Text }}
+      </span>
+      <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
+    </label>
+  </form>
+{{ end }}
+
+
+{{ block "wishlist-checked-item" . }}
+<form hx-put="/wishlist/{{ $.Id}}/{{.Index}}" id="form-{{ .Index}}" hx-swap="outerHTML">
+  <label class="secondary">
+    <input type="checkbox" name="name" checked x-on:click.prevent="submitForm({{.Index}})"/>
+    <span class="checked-text">
+      {{ .Text }}
+    </span>
+    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
+  </label>
+</form>
 {{ end }}

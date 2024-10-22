@@ -3,15 +3,15 @@
   <nav>
     <ul>
       <li>
-        <a href="http://localhost:1323" class="secondary"
+        <a href="http://localhost:1323" class="contrast"
           ><strong>Wishlist</strong></a
         >
       </li>
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        <button x-show="isCreating" class="contrast outline save-button" x-on:click="toggleForm()">Save</button>
-        <button x-show="!isCreating" class="contrast outline save-button" x-on:click="setFormAsCreating()">Edit</button>
+        <button x-show="typeof isCreating !== 'undefined' && isCreating" class="contrast outline save-button" x-on:click="toggleForm()">Save</button>
+        <button x-show="typeof isCreating !== 'undefined' && !isCreating" class="contrast outline save-button" x-on:click="setFormAsCreating()">Edit</button>
         <button
           class="contrast theme-button"
           x-on:click="isDarkMode = !isDarkMode"

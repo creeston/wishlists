@@ -76,7 +76,8 @@ body {
 }
 
 .gift-cap-opened {
-  transform: rotate(-20deg) translateY(-60px);
+  transform: translateY(-40px);
+  /* transform: rotate(-20deg) translateY(-60px); */
 }
 
 .gift-cap > .gift-cap-base,
@@ -162,12 +163,12 @@ fieldset.wishlist-link button.clipboard-button {
 }
 
 .gift-cap {
-  max-width: 470px;
+  max-width: calc(100% - 40px);
   min-width: 320px;
 }
 
 .list-container {
   width: 250px;
   min-width: 250px;
-  max-width: 400px;
+  max-width: calc(100% - 110px);
 }

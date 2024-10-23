@@ -172,3 +172,11 @@ fieldset.wishlist-link button.clipboard-button {
   min-width: 250px;
   max-width: calc(100% - 110px);
 }
+
+.checked-text {
+  opacity: 0.5;
+}
+
+.crossed-text {
+  text-decoration: line-through;
+}

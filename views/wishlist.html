@@ -16,7 +16,11 @@
       <div class="list-container" x-init="initializeSpanWidths()">
         {{ range .Items }}
           {{ if .Checked }}
-            {{ template "wishlist-checked-item" . }}
+            {{ if .CheckedByAnotherUser }}
+              {{ template "wishlist-already-checked-item" . }}
+            {{ else }}
+              {{ template "wishlist-checked-item" . }}
+            {{ end }}
           {{ else }}
             {{ template "wishlist-not-checked-item" . }}
           {{ end }}
@@ -25,13 +29,6 @@
     </div>
   </main>
 </body>
-
-<style>
-  .checked-text {
-    text-decoration: line-through;
-    opacity: 0.5;
-  }
-</style>
 
 <script>
   const capDiv = document.getElementsByClassName("gift-cap")[0];
@@ -90,4 +87,36 @@
     <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
   </label>
 </form>
+{{ end }}
+
+{{ block "wishlist-already-checked-item" . }}
+<div x-data="{'modalOpened': true}">
+  <label class="secondary">
+    <input type="checkbox" name="name" checked disabled/>
+    <span class="checked-text crossed-text">
+      {{ .Text }}
+    </span>
+    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
+  </label>
+</div>
+{{ end }}
+
+{{ block "wishlist-already-checked-item-with-popup" . }}
+<div x-data="{'modalOpened': true}">
+  {{ template "wishlist-already-checked-item" . }}
+
+  <dialog :open="modalOpened">
+    <article>
+      <h2>Item was already checked</h2>
+      <p>
+        This item was already checked off the list by another user.
+      </p>
+      <footer>
+        <button class="secondary" x-on:click="modalOpened = !modalOpened">
+          Ok
+        </button>
+      </footer>
+    </article>
+  </dialog>
+</div>
 {{ end }}

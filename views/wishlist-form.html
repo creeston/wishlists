@@ -13,12 +13,18 @@
   <div class="list-inputs" x-init="initializeFormValues()">
     <template x-for="(input, index) in inputs" :key="index" x-effect="inputs && $nextTick(() => initializeSpanWidths())">
       <div class="input-row">
-        <span :class="{'invisible': !input}" x-text="(index + 1) + '.'"> </span>
+        <span :class="{'invisible': !input || disabledInputs[index]}" x-text="(index + 1) + '.'"> </span>
         <div class="input-container">
-          <input :disabled="!isCreating" :id="'input-' + index" x-model="inputs[index]" x-on:input="resizeInput($event, index)"
+          <input 
+            :disabled="!isCreating || disabledInputs[index]" 
+            :id="'input-' + index" 
+            :class="{'crossed-text': disabledInputs[index]}"
+            x-model="inputs[index]" 
+            x-on:input="resizeInput($event, index)"
             x-on:keydown.enter.prevent="focusOnNextInputElement(index)"
             x-on:keydown.backspace="removeIfAlreadyEmpty(index)" :name="'item' + index" type="text"
-            placeholder="Start typing..." />
+            placeholder="Start typing..." 
+          />
           <span :id="'input-hidden-span-' + index" class="hidden-span"></span>
         </div>
       </div>
@@ -31,12 +37,18 @@
     function wishlistFormData() {
       return {
         inputs: [],
+        disabledInputs: [],
         inputLengths: [],
         initializeFormValues() {
             {{ if .HasItems }}
               this.inputs = [
                 {{ range .Items }}
                   "{{ .Text }}",
+                {{ end }}
+              ];
+              this.disabledInputs = [
+                {{ range .Items }}
+                  {{ .AlreadyChecked }},
                 {{ end }}
               ];
               this.isCreating = false;

@@ -71,6 +71,8 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 			return c.Render(200, "not-found", NotFoundData{
 				NotFoundTitle:           i18n.Sprintf("Wishlist not found"),
 				CreateNewWishlistButton: i18n.Sprintf("Create new wishlist"),
+				Languages:               getLanguageList(i18n),
+				SelectedLanguage:        clientLanguage,
 			})
 		}
 
@@ -204,9 +206,4 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		return c.Render(200, "wishlist-checked-item", formData)
 	})
 
-}
-
-type NotFoundData struct {
-	NotFoundTitle           string
-	CreateNewWishlistButton string
 }

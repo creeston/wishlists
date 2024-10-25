@@ -55,6 +55,13 @@ type WishlistAlredyCheckedItemData struct {
 	ItemWasAlreadyCheckedOkayButton string
 }
 
+type NotFoundData struct {
+	NotFoundTitle           string
+	CreateNewWishlistButton string
+	Languages               []LanguageData
+	SelectedLanguage        string
+}
+
 func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 	items := []WishlistFormItem{}
 	for _, item := range wishlist.Items {

@@ -33,7 +33,11 @@
   <script>
     function wishlistFormData() {
       return {
+        {{ if .HasItems }}
         inputs: [],
+        {{ else }}
+        inputs: Alpine.$persist([]),
+        {{ end }}
         disabledInputs: [],
         inputLengths: [],
         initializeFormValues() {
@@ -51,10 +55,13 @@
           ];
           this.isCreating = false;
           this.wishlistId = {{ .Id }};
-        {{ else}}
-          this.inputs = [""];
+        {{ else }}
+          
+          if (this.inputs.length === 0 || this.inputs[this.inputs.length - 1] !== "") {
+            this.inputs.push("");
+          }
           this.isCreating = true;
-          this.isSaveEnabled = false;
+          this.isSaveEnabled = this.validateForm();
          {{ end }}
           this.inputLengths = [0];
           this.$watch('isCreating', value => { 
@@ -93,9 +100,15 @@
           this.inputs.splice(index, 1);
         },
         onInput(event, index) {
-          this.isSaveEnabled = this.inputs.some(input => input.trim() !== "");
+          this.isSaveEnabled = this.validateForm();
           const input = event.target;
           this.resizeInput(input, index);
+        },
+        validateForm() {
+          return this.inputs.some(input => input.trim() !== "");
+        },
+        onFormSubmit(event) {
+          this.inputs.splice(0, this.inputs.length)
         },
         resizeInput(input, index) {
           this.updateInputTextWidth(index, input.value, input);

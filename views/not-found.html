@@ -1,29 +1,13 @@
-{{ block "not-found" .}}
-
-<!DOCTYPE html>
-{{ template "heading" .}}
-
-<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
-    {{ template "top-bar" .}}
-
-    <main>
-        <div class="container">
-            <hgroup  style="text-align: center;">
-                <h1>Not found</h1>
-                <p><a href="/" class="secondary">Create new wishlist</a></p>
-            </hgroup>
-        </div>
-    </main>
+{{ block "not-found" .}} {{ template "heading" .}}
+<body x-data="themeData()" :data-theme="getTheme()">
+  {{ template "top-bar" .}}
+  <main>
+    <div class="container">
+      <hgroup style="text-align: center">
+        <h1>Not found</h1>
+        <p><a href="/" class="secondary">Create new wishlist</a></p>
+      </hgroup>
+    </div>
+  </main>
 </body>
-
-<script>
-    function wishlistData() {
-        return {
-            isDarkMode: Alpine.$persist(false),
-            toggleTheme() {
-                this.darkMode = !this.darkMode;
-            },
-        };
-    }
-</script>
 {{ end }}

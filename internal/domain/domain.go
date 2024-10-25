@@ -1,4 +1,4 @@
-package main
+package domain
 
 type WishlistItem struct {
 	Text        string
@@ -21,4 +21,14 @@ func NewWishlist(items []*WishlistItem, id int, userId string) *Wishlist {
 		Id:        id,
 		CreatorId: userId,
 	}
+}
+
+func (wishlist *Wishlist) GetItemByIndex(index int) *WishlistItem {
+	for _, item := range wishlist.Items {
+		if item.Index == index {
+			return item
+		}
+	}
+
+	return nil
 }

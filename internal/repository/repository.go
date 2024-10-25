@@ -1,15 +1,19 @@
-package main
+package repository
+
+import (
+	"creeston/lists/internal/domain"
+)
 
 type Data struct {
-	Wishlists Wishlists
+	Wishlists domain.Wishlists
 }
 
 func NewData() *Data {
 	data := &Data{
-		Wishlists: Wishlists{},
+		Wishlists: domain.Wishlists{},
 	}
 
-	data.AddWishlist("default", []*WishlistItem{
+	data.AddWishlist("default", []*domain.WishlistItem{
 		{Text: "Cake", Index: 0},
 		{Text: "Candles", Index: 1},
 		{Text: "Balloons", Index: 2},
@@ -19,7 +23,7 @@ func NewData() *Data {
 	return data
 }
 
-func (data *Data) UpdateWishlistWithItems(wishlistId int, items []*WishlistItem) {
+func (data *Data) UpdateWishlistWithItems(wishlistId int, items []*domain.WishlistItem) {
 	wishlist := data.GetWishlistByIdOrNull(wishlistId)
 	if wishlist == nil {
 		return
@@ -40,28 +44,18 @@ func (data *Data) UpdateWishlistWithItems(wishlistId int, items []*WishlistItem)
 	}
 }
 
-func (data *Data) AddWishlist(userId string, items []*WishlistItem) *Wishlist {
+func (data *Data) AddWishlist(userId string, items []*domain.WishlistItem) *domain.Wishlist {
 	wishlistId := len(data.Wishlists)
-	wishlist := NewWishlist(items, wishlistId, userId)
+	wishlist := domain.NewWishlist(items, wishlistId, userId)
 	data.Wishlists = append(data.Wishlists, wishlist)
 
 	return wishlist
 }
 
-func (data *Data) GetWishlistByIdOrNull(id int) *Wishlist {
+func (data *Data) GetWishlistByIdOrNull(id int) *domain.Wishlist {
 	if (id < 0) || (id >= len(data.Wishlists)) {
 		return nil
 	}
 
 	return data.Wishlists[id]
-}
-
-func (wishlist *Wishlist) GetItemByIndex(index int) *WishlistItem {
-	for _, item := range wishlist.Items {
-		if item.Index == index {
-			return item
-		}
-	}
-
-	return nil
 }

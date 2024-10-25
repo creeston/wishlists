@@ -1,4 +1,10 @@
-package main
+package handlers
+
+import (
+	"creeston/lists/internal/domain"
+	"sort"
+	"strconv"
+)
 
 type WishlistFormData struct {
 	Items    []WishlistFormItem
@@ -26,7 +32,7 @@ type WishlistCheckedItemData struct {
 	CheckedByAnotherUser bool
 }
 
-func MapWishlistToWishlistFormData(wishlist *Wishlist) WishlistFormData {
+func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 	items := []WishlistFormItem{}
 	for _, item := range wishlist.Items {
 		items = append(items, WishlistFormItem{
@@ -44,7 +50,7 @@ func MapWishlistToWishlistFormData(wishlist *Wishlist) WishlistFormData {
 	}
 }
 
-func MapWishlistToWishlistViewFormData(wishlist *Wishlist, userId string) WishlistViewFormData {
+func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string) WishlistViewFormData {
 	items := []WishlistCheckedItemData{}
 	for _, item := range wishlist.Items {
 		items = append(items, WishlistCheckedItemData{
@@ -60,4 +66,36 @@ func MapWishlistToWishlistViewFormData(wishlist *Wishlist, userId string) Wishli
 		Items: items,
 		Id:    wishlist.Id,
 	}
+}
+
+func ParseWishlistFormDataToWishlistItems(data map[string][]string) []*domain.WishlistItem {
+	items := []*domain.WishlistItem{}
+	for key, value := range data {
+		if key[:4] != "item" {
+			continue
+		}
+
+		if len(value) == 0 {
+			continue
+		}
+
+		text := value[0]
+		if text == "" {
+			continue
+		}
+
+		indexStringValue := key[4:]
+		index, error := strconv.Atoi(indexStringValue)
+		if error != nil {
+			return nil
+		}
+
+		items = append(items, &domain.WishlistItem{Text: value[0], Index: index})
+	}
+
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Index < items[j].Index
+	})
+
+	return items
 }

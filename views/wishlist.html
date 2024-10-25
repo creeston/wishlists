@@ -1,33 +1,30 @@
-{{ block "wishlist" . }}
-<!DOCTYPE html>
-{{ template "heading" .}}
+{{ block "wishlist" . }} 
 
-<body x-data="wishlistData()" x-bind:data-theme="isDarkMode ? 'dark' : 'light'">
+{{ template "heading" .}}
+<body x-data="{...themeData(), ...wishlistData()}" :data-theme="getTheme()">
   {{ template "top-bar" .}}
 
-  <main>
-    <div class="main-container">
-      <div class="gift-cap">
-        <div class="gift-tape-2"></div>
-        <div class="gift-tape-1"></div>
-        <div class="gift-cap-base"></div>
-        <div class="gift-cap-tape"></div>
-      </div>
-      <div class="list-container" x-init="initializeSpanWidths()">
-        {{ range .Items }}
-          {{ if .Checked }}
-            {{ if .CheckedByAnotherUser }}
-              {{ template "wishlist-already-checked-item" . }}
-            {{ else }}
-              {{ template "wishlist-checked-item" . }}
-            {{ end }}
-          {{ else }}
-            {{ template "wishlist-not-checked-item" . }}
-          {{ end }}
-        {{ end }}
-      </div>
+  <div class="main-container">
+    <div class="gift-cap">
+      <div class="gift-tape-2"></div>
+      <div class="gift-tape-1"></div>
+      <div class="gift-cap-base"></div>
+      <div class="gift-cap-tape"></div>
     </div>
-  </main>
+    <div class="list-container" x-init="initializeSpanWidths()">
+      {{ range .Items }} 
+        {{ if .Checked }}
+          {{ if .CheckedByAnotherUser }} 
+            {{ template "wishlist-already-checked-item" . }} 
+          {{ else }} 
+            {{ template "wishlist-checked-item" . }} 
+          {{ end }} 
+        {{ else }} 
+          {{ template "wishlist-not-checked-item" . }} 
+        {{ end }} 
+      {{ end }}
+    </div>
+  </div>
 </body>
 
 <script>
@@ -37,10 +34,6 @@
 
   function wishlistData() {
     return {
-      isDarkMode: Alpine.$persist(false),
-      toggleTheme() {
-        this.darkMode = !this.darkMode;
-      },
       initializeSpanWidths() {
         const inputLengths = [];
         for (let i = 0; i < hiddenSpans.length; i++) {
@@ -61,56 +54,70 @@
     };
   }
 </script>
-
-{{ end }}
+{{ end }} 
 
 {{ block "wishlist-not-checked-item" . }}
-  <form hx-put="/wishlist/{{ .Id}}/{{.Index}}" id="form-{{ .Index}}" hx-swap="outerHTML">
-    <label>
-      <input type="checkbox" name="flag" x-on:click.prevent="submitForm({{.Index}})"/>
-      <span>
-        {{ .Text }}
-      </span>
-      <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
-    </label>
-  </form>
-{{ end }}
+<form
+  hx-put="/wishlist/{{ .Id}}/{{.Index}}"
+  id="form-{{ .Index}}"
+  hx-swap="outerHTML"
+>
+  <label>
+    <input
+      type="checkbox"
+      name="flag"
+      x-on:click.prevent="submitForm({{.Index}})"
+    />
+    <span>{{ .Text }}</span>
+    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">
+      {{ .Text }}
+    </span>
+  </label>
+</form>
+{{ end }} 
 
 
 {{ block "wishlist-checked-item" . }}
-<form hx-put="/wishlist/{{ $.Id}}/{{.Index}}" id="form-{{ .Index}}" hx-swap="outerHTML">
+<form
+  hx-put="/wishlist/{{ $.Id}}/{{.Index}}"
+  id="form-{{ .Index}}"
+  hx-swap="outerHTML"
+>
   <label class="secondary">
-    <input type="checkbox" name="name" checked x-on:click.prevent="submitForm({{.Index}})"/>
-    <span class="checked-text">
+    <input
+      type="checkbox"
+      name="name"
+      checked
+      x-on:click.prevent="submitForm({{.Index}})"
+    />
+    <span class="checked-text"> {{ .Text }} </span>
+    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">
       {{ .Text }}
     </span>
-    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
   </label>
 </form>
-{{ end }}
+{{ end }} 
+
 
 {{ block "wishlist-already-checked-item" . }}
 <div x-data="{'modalOpened': true}">
   <label class="secondary">
-    <input type="checkbox" name="name" checked disabled/>
-    <span class="checked-text crossed-text">
+    <input type="checkbox" name="name" checked disabled />
+    <span class="checked-text crossed-text"> {{ .Text }} </span>
+    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">
       {{ .Text }}
     </span>
-    <span id="input-hidden-span-{{ .Index }}" class="hidden-span">{{ .Text }}</span>
   </label>
 </div>
-{{ end }}
+{{ end }} 
 
 {{ block "wishlist-already-checked-item-with-popup" . }}
 <div x-data="{'modalOpened': true}">
   {{ template "wishlist-already-checked-item" . }}
-
   <dialog :open="modalOpened">
     <article>
       <h2>Item was already checked</h2>
-      <p>
-        This item was already checked off the list by another user.
-      </p>
+      <p>This item was already checked off the list by another user.</p>
       <footer>
         <button class="secondary" x-on:click="modalOpened = !modalOpened">
           Ok

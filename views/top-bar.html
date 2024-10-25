@@ -6,8 +6,13 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        <button x-show="isCreating" :disabled="!isSaveEnabled" class="contrast outline save-button" x-on:click="toggleForm()">Save</button>
-        <button x-show="!isCreating" class="contrast outline save-button" x-on:click="setFormAsCreating()">Edit</button>
+        <button x-show="isCreating" :disabled="!isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .SaveButtonTitle }}</button>
+        <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .EditButtonTitle }}</button>
+      </li>
+      <li>
+        {{ template "language-select" . }}
+      </li>
+      <li>
         {{ template "theme-button" . }}
       </li>
     </ul>
@@ -29,6 +34,9 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
+        {{ template "language-select" . }}
+      </li>
+      <li>
         {{ template "theme-button" . }}
       </li>
     </ul>
@@ -39,7 +47,7 @@
 
 {{ block "app-title" . }}
   <li>
-    <a href="http://localhost:1323" class="contrast">
+    <a href="http://localhost:1323" class="secondary">
       <strong>Wishlist</strong>
     </a>
   </li>
@@ -52,7 +60,7 @@
 
 {{ block "theme-button" . }}
   <button
-    class="contrast theme-button"
+    class="secondary theme-button"
     x-on:click="isDarkMode = !isDarkMode"
   >
     <svg
@@ -92,4 +100,25 @@
       />
     </svg>
   </button>
+{{ end }}
+
+{{ block "language-select" . }}
+<div x-data="getLanguageData()" >
+  <select x-model="selectedLanguage" @change="onLanguageSelected($event.target.value)">
+    {{ range .Languages }}
+      <option value="{{ .Code }}" >{{ .Language }}</option>
+    {{ end }}
+  </select>
+</div>
+<script>
+  function getLanguageData () {
+    return {
+      selectedLanguage: "{{ .SelectedLanguage }}",
+      onLanguageSelected(language) {
+        setCookie("lang", language, 365);
+        window.location.reload();
+      }
+    }
+  }
+</script>
 {{ end }}

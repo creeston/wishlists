@@ -13,31 +13,36 @@
     crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="/js/script.js" defer></script>
 </head>
 
 <script>
-  function setCookie(name,value,days) {
-    var expires = "";
-    if (days) {
+    function setCookie(name, value, days) {
+      var expires = "";
+      if (days) {
         var date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
         expires = "; expires=" + date.toUTCString();
+      }
+      document.cookie = name + "=" + (value || "") + expires + "; path=/";
     }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-}
 
-  setCookie("lang", "be-BY", 365);
-  function themeData() {
-    return {
-      isDarkMode: Alpine.$persist(false),
-      toggleTheme() {
-        this.darkMode = !this.darkMode;
-      },
-      getTheme() {
-        return this.isDarkMode ? "dark" : "light";
-      },
-    };
-  }
+    function themeData() {
+      return {
+        isDarkMode: Alpine.$persist(false),
+        toggleTheme() {
+          this.darkMode = !this.darkMode;
+        },
+        getTheme() {
+          return this.isDarkMode ? "dark" : "light";
+        },
+      };
+    }
 </script>
+
+<style>
+  
+.edge-navbar-options li {
+  margin-left: 5px;
+}
+</style>
 {{ end }}

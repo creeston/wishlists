@@ -2,20 +2,97 @@ package handlers
 
 import (
 	"creeston/lists/internal/repository"
+	"sort"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
 
-	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 
 	_ "creeston/lists/internal/translations"
 )
 
-func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
+func getLanguageList(i18n *message.Printer) []LanguageData {
+	languages := []LanguageData{
+		{
+			Language: i18n.Sprintf("English"),
+			Code:     "en-GB",
+		},
+		{
+			Language: i18n.Sprintf("Russian"),
+			Code:     "ru-RU",
+		},
+		{
+			Language: i18n.Sprintf("Polish"),
+			Code:     "pl-PL",
+		},
+		{
+			Language: i18n.Sprintf("Belarusian"),
+			Code:     "be-BY",
+		},
+	}
 
+	sort.Slice(languages, func(i, j int) bool {
+		return languages[i].Language < languages[j].Language
+	})
+
+	return languages
+}
+
+func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 	e.GET("/", func(c echo.Context) error {
-		return c.Render(200, "index", WishlistFormData{HasItems: false, HasId: false})
+		i18n := c.Get("i18n").(*message.Printer)
+		language := c.Get("clientLanguage").(string)
+		return c.Render(
+			200,
+			"index",
+			WishlistFormData{
+				HasItems:                    false,
+				HasId:                       false,
+				CopyToClipboardTooltipLabel: i18n.Sprintf("Copy to clipboard"),
+				WishlistItemPlaceholder:     i18n.Sprintf("Start typing..."),
+				SaveButtonTitle:             i18n.Sprintf("Save"),
+				EditButtonTitle:             i18n.Sprintf("Edit"),
+				Languages:                   getLanguageList(i18n),
+				SelectedLanguage:            language,
+			})
+	})
+
+	e.GET("/wishlist/:id", func(c echo.Context) error {
+		i18n := c.Get("i18n").(*message.Printer)
+		clientLanguage := c.Get("clientLanguage").(string)
+
+		id, error := strconv.Atoi(c.Param("id"))
+		if error != nil {
+			return error
+		}
+
+		if (id < 0) || (id >= len(repo.Wishlists)) {
+			return c.Render(200, "not-found", NotFoundData{
+				NotFoundTitle:           i18n.Sprintf("Wishlist not found"),
+				CreateNewWishlistButton: i18n.Sprintf("Create new wishlist"),
+			})
+		}
+
+		wishlist := repo.Wishlists[id]
+		userId := c.Get("userId").(string)
+		if userId != wishlist.CreatorId {
+			viewData := MapWishlistToWishlistViewFormData(wishlist, userId)
+			viewData.EditButtonTitle = i18n.Sprintf("Edit")
+			viewData.SaveButtonTitle = i18n.Sprintf("Save")
+			viewData.Languages = getLanguageList(i18n)
+			viewData.SelectedLanguage = clientLanguage
+			return c.Render(200, "wishlist", viewData)
+		}
+
+		formData := MapWishlistToWishlistFormData(wishlist)
+		formData.CopyToClipboardTooltipLabel = i18n.Sprintf("Copy to clipboard")
+		formData.WishlistItemPlaceholder = i18n.Sprintf("Start typing...")
+		formData.SaveButtonTitle = i18n.Sprintf("Save")
+		formData.EditButtonTitle = i18n.Sprintf("Edit")
+		formData.Languages = getLanguageList(i18n)
+		formData.SelectedLanguage = clientLanguage
+		return c.Render(200, "index", formData)
 	})
 
 	e.POST("/wishlist", func(c echo.Context) error {
@@ -97,7 +174,15 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		}
 
 		if checkRequest && wishlistItem.Checked && wishlistItem.CheckedById != userId {
-			return c.Render(200, "wishlist-already-checked-item-with-popup", formData)
+			i18n := c.Get("i18n").(*message.Printer)
+			viewData := WishlistAlredyCheckedItemData{
+				Index:                           wishlistItem.Index,
+				Text:                            wishlistItem.Text,
+				ItemWasAlreadyCheckedPopupTitle: i18n.Sprintf("Item was already taken"),
+				ItemWasAlreadyCheckedPopupText:  i18n.Sprintf("This item was already taken by another user"),
+				ItemWasAlreadyCheckedOkayButton: i18n.Sprintf("Okay"),
+			}
+			return c.Render(200, "wishlist-already-checked-item-with-popup", viewData)
 		}
 
 		if !checkRequest && !wishlistItem.Checked {
@@ -119,37 +204,6 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		return c.Render(200, "wishlist-checked-item", formData)
 	})
 
-	e.GET("/wishlist/:id", func(c echo.Context) error {
-		acceptLang := c.Request().Header.Get("Accept-Language")
-		acceptLang = acceptLang[:5]
-
-		cookieLang, _ := c.Cookie("lang")
-		if cookieLang != nil {
-			acceptLang = cookieLang.Value
-		}
-		lang := language.MustParse(acceptLang)
-		p := message.NewPrinter(lang)
-
-		id, error := strconv.Atoi(c.Param("id"))
-		if error != nil {
-			return error
-		}
-
-		if (id < 0) || (id >= len(repo.Wishlists)) {
-			return c.Render(200, "not-found", NotFoundData{
-				NotFoundTitle:           p.Sprintf("Wishlist not found"),
-				CreateNewWishlistButton: p.Sprintf("Create new wishlist"),
-			})
-		}
-
-		wishlist := repo.Wishlists[id]
-		userId := c.Get("userId").(string)
-		if userId != wishlist.CreatorId {
-			return c.Render(200, "wishlist", MapWishlistToWishlistViewFormData(wishlist, userId))
-		}
-
-		return c.Render(200, "index", MapWishlistToWishlistFormData(wishlist))
-	})
 }
 
 type NotFoundData struct {

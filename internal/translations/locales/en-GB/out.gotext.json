@@ -2,6 +2,62 @@
     "language": "en-GB",
     "messages": [
         {
+            "id": "English",
+            "message": "English",
+            "translation": "English",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Russian",
+            "message": "Russian",
+            "translation": "Russian",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Polish",
+            "message": "Polish",
+            "translation": "Polish",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Belarusian",
+            "message": "Belarusian",
+            "translation": "Belarusian",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Copy to clipboard",
+            "message": "Copy to clipboard",
+            "translation": "Copy to clipboard",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Start typing...",
+            "message": "Start typing...",
+            "translation": "Start typing...",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Save",
+            "message": "Save",
+            "translation": "Save",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Edit",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "Wishlist not found",
             "message": "Wishlist not found",
             "translation": "Wishlist not found",
@@ -12,6 +68,27 @@
             "id": "Create new wishlist",
             "message": "Create new wishlist",
             "translation": "Create new wishlist",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Item was already taken",
+            "message": "Item was already taken",
+            "translation": "Item was already taken",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "This item was already taken by another user",
+            "message": "This item was already taken by another user",
+            "translation": "This item was already taken by another user",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Okay",
+            "message": "Okay",
+            "translation": "Okay",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         }

@@ -164,12 +164,12 @@ fieldset.wishlist-link button.clipboard-button {
 
 .gift-cap {
   max-width: calc(100% - 40px);
-  min-width: 320px;
+  min-width: 360px;
 }
 
 .list-container {
-  width: 250px;
-  min-width: 250px;
+  width: 290px;
+  min-width: 290px;
   max-width: calc(100% - 110px);
 }
 

@@ -23,7 +23,7 @@
             x-on:input="onInput($event, index)"
             x-on:keydown.enter.prevent="focusOnNextInputElement(index)"
             x-on:keydown.backspace="removeIfAlreadyEmpty(index)" :name="'item' + index" type="text"
-            placeholder="Start typing..." 
+            :placeholder="index === 0 ? '{{ .WishlistItemPlaceholder }}' : ''" 
           />
           <span :id="'input-hidden-span-' + index" class="hidden-span"></span>
         </div>

@@ -13,6 +13,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 type Templates struct {
@@ -50,6 +53,38 @@ func UserIdCookieHandler(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
+func getLanguageFromRequest(c echo.Context) language.Tag {
+	cookieLang, err := c.Cookie("lang")
+	if err == nil {
+		cookieValue := cookieLang.Value
+		lang, err := language.Parse(cookieValue)
+		if err == nil {
+			return lang
+		}
+	}
+
+	acceptLang := c.Request().Header.Get("Accept-Language")
+	acceptLang = acceptLang[:5]
+	lang := message.MatchLanguage(acceptLang)
+	return lang
+	// lang, err := language.Parse(acceptLang)
+	// if err == nil {
+	// 	return lang
+	// }
+
+	// return language.English
+}
+
+func LanguageHandler(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		lang := getLanguageFromRequest(c)
+		p := message.NewPrinter(lang)
+		c.Set("clientLanguage", lang.String()[:5])
+		c.Set("i18n", p)
+		return next(c)
+	}
+}
+
 func main() {
 	godotenv.Load()
 	e := echo.New()
@@ -59,6 +94,7 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(UserIdCookieHandler)
+	e.Use(LanguageHandler)
 	e.Renderer = NewTemplate()
 	handlers.SetupRoutes(e, data, baseUrl)
 	e.Static("/css", "css")

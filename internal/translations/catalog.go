@@ -41,35 +41,71 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"Create new wishlist": 1,
-	"Wishlist not found":  0,
+	"Belarusian":             3,
+	"Copy to clipboard":      4,
+	"Create new wishlist":    9,
+	"Edit":                   7,
+	"English":                0,
+	"Item was already taken": 10,
+	"Okay":                   12,
+	"Polish":                 2,
+	"Russian":                1,
+	"Save":                   6,
+	"Start typing...":        5,
+	"This item was already taken by another user": 11,
+	"Wishlist not found":                          8,
 }
 
-var be_BYIndex = []uint32{ // 3 elements
-	0x00000000, 0x00000032, 0x00000066,
-} // Size: 36 bytes
+var be_BYIndex = []uint32{ // 14 elements
+	0x00000000, 0x00000015, 0x00000022, 0x00000033,
+	0x00000048, 0x00000078, 0x00000097, 0x000000a8,
+	0x000000bd, 0x000000ef, 0x00000123, 0x0000014b,
+	0x000001a4, 0x000001af,
+} // Size: 80 bytes
 
-const be_BYData string = "" + // Size: 102 bytes
-	"\x02Спіс жаданняў не знойдзены\x02Стварыць новы спіс жаданняў"
+const be_BYData string = "" + // Size: 431 bytes
+	"\x02Англійская\x02Руская\x02Польская\x02Беларуская\x02Скапіяваць у буфер" +
+	" абмену\x02Пачніце пісаць...\x02Захаваць\x02Рэдагаваць\x02Спіс жаданняў " +
+	"не знойдзены\x02Стварыць новы спіс жаданняў\x02Элемент ужо быў узяты" +
+	"\x02Гэты элемент ужо быў узяты іншым карыстальнікам\x02Добра"
 
-var en_GBIndex = []uint32{ // 3 elements
-	0x00000000, 0x00000013, 0x00000027,
-} // Size: 36 bytes
+var en_GBIndex = []uint32{ // 14 elements
+	0x00000000, 0x00000008, 0x00000010, 0x00000017,
+	0x00000022, 0x00000034, 0x00000044, 0x00000049,
+	0x0000004e, 0x00000061, 0x00000075, 0x0000008c,
+	0x000000b8, 0x000000bd,
+} // Size: 80 bytes
 
-const en_GBData string = "\x02Wishlist not found\x02Create new wishlist"
+const en_GBData string = "" + // Size: 189 bytes
+	"\x02English\x02Russian\x02Polish\x02Belarusian\x02Copy to clipboard\x02S" +
+	"tart typing...\x02Save\x02Edit\x02Wishlist not found\x02Create new wishl" +
+	"ist\x02Item was already taken\x02This item was already taken by another " +
+	"user\x02Okay"
 
-var pl_PLIndex = []uint32{ // 3 elements
-	0x00000000, 0x0000001e, 0x0000003c,
-} // Size: 36 bytes
+var pl_PLIndex = []uint32{ // 14 elements
+	0x00000000, 0x0000000a, 0x00000013, 0x0000001a,
+	0x00000026, 0x00000038, 0x0000004a, 0x00000051,
+	0x00000058, 0x00000076, 0x00000094, 0x000000b1,
+	0x000000ec, 0x000000ef,
+} // Size: 80 bytes
 
-const pl_PLData string = "" + // Size: 60 bytes
-	"\x02Lista życzeń nie znaleziona\x02Utwórz nową listę życzeń"
+const pl_PLData string = "" + // Size: 239 bytes
+	"\x02Angielski\x02Rosyjski\x02Polski\x02Białoruski\x02Kopiuj do schowka" +
+	"\x02Zacznij pisać...\x02Zapisz\x02Edytuj\x02Lista życzeń nie znaleziona" +
+	"\x02Utwórz nową listę życzeń\x02Element został już zabrany\x02Ten elemen" +
+	"t został już zabrany przez innego użytkownika\x02OK"
 
-var ru_RUIndex = []uint32{ // 3 elements
-	0x00000000, 0x0000002e, 0x00000064,
-} // Size: 36 bytes
+var ru_RUIndex = []uint32{ // 14 elements
+	0x00000000, 0x00000015, 0x00000024, 0x00000035,
+	0x0000004c, 0x0000007e, 0x000000a1, 0x000000b4,
+	0x000000cf, 0x000000fd, 0x00000133, 0x00000159,
+	0x000001b0, 0x000001b9,
+} // Size: 80 bytes
 
-const ru_RUData string = "" + // Size: 100 bytes
-	"\x02Список желаний не найден\x02Создать новый список желаний"
+const ru_RUData string = "" + // Size: 441 bytes
+	"\x02Английский\x02Русский\x02Польский\x02Белорусский\x02Скопировать в бу" +
+	"фер обмена\x02Начните печатать...\x02Сохранить\x02Редактировать\x02Спис" +
+	"ок желаний не найден\x02Создать новый список желаний\x02Элемент уже был" +
+	" взят\x02Этот элемент уже был взят другим пользователем\x02Окей"
 
-	// Total table size 445 bytes (0KiB); checksum: CACD2550
+	// Total table size 1620 bytes (1KiB); checksum: B5AA50E7

@@ -2,6 +2,46 @@
     "language": "ru-RU",
     "messages": [
         {
+            "id": "English",
+            "message": "English",
+            "translation": "Английский"
+        },
+        {
+            "id": "Russian",
+            "message": "Russian",
+            "translation": "Русский"
+        },
+        {
+            "id": "Polish",
+            "message": "Polish",
+            "translation": "Польский"
+        },
+        {
+            "id": "Belarusian",
+            "message": "Belarusian",
+            "translation": "Белорусский"
+        },
+        {
+            "id": "Copy to clipboard",
+            "message": "Copy to clipboard",
+            "translation": "Скопировать в буфер обмена"
+        },
+        {
+            "id": "Start typing...",
+            "message": "Start typing...",
+            "translation": "Начните печатать..."
+        },
+        {
+            "id": "Save",
+            "message": "Save",
+            "translation": "Сохранить"
+        },
+        {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Редактировать"
+        },
+        {
             "id": "Wishlist not found",
             "message": "Wishlist not found",
             "translation": "Список желаний не найден"
@@ -10,6 +50,21 @@
             "id": "Create new wishlist",
             "message": "Create new wishlist",
             "translation": "Создать новый список желаний"
+        },
+        {
+            "id": "Item was already taken",
+            "message": "Item was already taken",
+            "translation": "Элемент уже был взят"
+        },
+        {
+            "id": "This item was already taken by another user",
+            "message": "This item was already taken by another user",
+            "translation": "Этот элемент уже был взят другим пользователем"
+        },
+        {
+            "id": "Okay",
+            "message": "Okay",
+            "translation": "Окей"
         }
     ]
 }

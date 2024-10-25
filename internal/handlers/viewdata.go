@@ -6,11 +6,22 @@ import (
 	"strconv"
 )
 
+type LanguageData struct {
+	Language string
+	Code     string
+}
+
 type WishlistFormData struct {
-	Items    []WishlistFormItem
-	HasItems bool
-	HasId    bool
-	Id       int
+	Items                       []WishlistFormItem
+	HasItems                    bool
+	HasId                       bool
+	Id                          int
+	CopyToClipboardTooltipLabel string
+	WishlistItemPlaceholder     string
+	SaveButtonTitle             string
+	EditButtonTitle             string
+	Languages                   []LanguageData
+	SelectedLanguage            string
 }
 
 type WishlistFormItem struct {
@@ -20,8 +31,12 @@ type WishlistFormItem struct {
 }
 
 type WishlistViewFormData struct {
-	Items []WishlistCheckedItemData
-	Id    int
+	Items            []WishlistCheckedItemData
+	Id               int
+	SaveButtonTitle  string
+	EditButtonTitle  string
+	Languages        []LanguageData
+	SelectedLanguage string
 }
 
 type WishlistCheckedItemData struct {
@@ -30,6 +45,14 @@ type WishlistCheckedItemData struct {
 	Id                   int
 	Checked              bool
 	CheckedByAnotherUser bool
+}
+
+type WishlistAlredyCheckedItemData struct {
+	Text                            string
+	Index                           int
+	ItemWasAlreadyCheckedPopupTitle string
+	ItemWasAlreadyCheckedPopupText  string
+	ItemWasAlreadyCheckedOkayButton string
 }
 
 func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {

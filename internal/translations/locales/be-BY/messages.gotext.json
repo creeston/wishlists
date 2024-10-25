@@ -2,6 +2,46 @@
     "language": "be-BY",
     "messages": [
         {
+            "id": "English",
+            "message": "English",
+            "translation": "Англійская"
+        },
+        {
+            "id": "Russian",
+            "message": "Russian",
+            "translation": "Руская"
+        },
+        {
+            "id": "Polish",
+            "message": "Polish",
+            "translation": "Польская"
+        },
+        {
+            "id": "Belarusian",
+            "message": "Belarusian",
+            "translation": "Беларуская"
+        },
+        {
+            "id": "Copy to clipboard",
+            "message": "Copy to clipboard",
+            "translation": "Скапіяваць у буфер абмену"
+        },
+        {
+            "id": "Start typing...",
+            "message": "Start typing...",
+            "translation": "Пачніце пісаць..."
+        },
+        {
+            "id": "Save",
+            "message": "Save",
+            "translation": "Захаваць"
+        },
+        {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Рэдагаваць"
+        },
+        {
             "id": "Wishlist not found",
             "message": "Wishlist not found",
             "translation": "Спіс жаданняў не знойдзены"
@@ -10,6 +50,21 @@
             "id": "Create new wishlist",
             "message": "Create new wishlist",
             "translation": "Стварыць новы спіс жаданняў"
+        },
+        {
+            "id": "Item was already taken",
+            "message": "Item was already taken",
+            "translation": "Элемент ужо быў узяты"
+        },
+        {
+            "id": "This item was already taken by another user",
+            "message": "This item was already taken by another user",
+            "translation": "Гэты элемент ужо быў узяты іншым карыстальнікам"
+        },
+        {
+            "id": "Okay",
+            "message": "Okay",
+            "translation": "Добра"
         }
     ]
 }

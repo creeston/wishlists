@@ -2,6 +2,46 @@
     "language": "pl-PL",
     "messages": [
         {
+            "id": "English",
+            "message": "English",
+            "translation": "Angielski"
+        },
+        {
+            "id": "Russian",
+            "message": "Russian",
+            "translation": "Rosyjski"
+        },
+        {
+            "id": "Polish",
+            "message": "Polish",
+            "translation": "Polski"
+        },
+        {
+            "id": "Belarusian",
+            "message": "Belarusian",
+            "translation": "Białoruski"
+        },
+        {
+            "id": "Copy to clipboard",
+            "message": "Copy to clipboard",
+            "translation": "Kopiuj do schowka"
+        },
+        {
+            "id": "Start typing...",
+            "message": "Start typing...",
+            "translation": "Zacznij pisać..."
+        },
+        {
+            "id": "Save",
+            "message": "Save",
+            "translation": "Zapisz"
+        },
+        {
+            "id": "Edit",
+            "message": "Edit",
+            "translation": "Edytuj"
+        },
+        {
             "id": "Wishlist not found",
             "message": "Wishlist not found",
             "translation": "Lista życzeń nie znaleziona"
@@ -10,6 +50,21 @@
             "id": "Create new wishlist",
             "message": "Create new wishlist",
             "translation": "Utwórz nową listę życzeń"
+        },
+        {
+            "id": "Item was already taken",
+            "message": "Item was already taken",
+            "translation": "Element został już zabrany"
+        },
+        {
+            "id": "This item was already taken by another user",
+            "message": "This item was already taken by another user",
+            "translation": "Ten element został już zabrany przez innego użytkownika"
+        },
+        {
+            "id": "Okay",
+            "message": "Okay",
+            "translation": "OK"
         }
     ]
 }

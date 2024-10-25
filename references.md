@@ -20,3 +20,7 @@ https://tailwindui.com/components?ref=sidebar
 https://www.reddit.com/r/htmx/comments/1cmj9xf/htmx_and_tailwind_best_practice/ 
 
 https://xeiaso.net/blog/using-tailwind-go/
+
+
+
+https://www.alexedwards.net/blog/i18n-managing-translations

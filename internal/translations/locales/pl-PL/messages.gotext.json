@@ -1,0 +1,15 @@
+{
+    "language": "pl-PL",
+    "messages": [
+        {
+            "id": "Wishlist not found",
+            "message": "Wishlist not found",
+            "translation": "Lista życzeń nie znaleziona"
+        },
+        {
+            "id": "Create new wishlist",
+            "message": "Create new wishlist",
+            "translation": "Utwórz nową listę życzeń"
+        }
+    ]
+}

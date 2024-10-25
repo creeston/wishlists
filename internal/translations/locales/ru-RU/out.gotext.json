@@ -1,0 +1,15 @@
+{
+    "language": "ru-RU",
+    "messages": [
+        {
+            "id": "Wishlist not found",
+            "message": "Wishlist not found",
+            "translation": "Список желаний не найден"
+        },
+        {
+            "id": "Create new wishlist",
+            "message": "Create new wishlist",
+            "translation": "Создать новый список желаний"
+        }
+    ]
+}

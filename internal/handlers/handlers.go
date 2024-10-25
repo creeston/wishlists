@@ -5,9 +5,15 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+
+	_ "creeston/lists/internal/translations"
 )
 
 func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
+
 	e.GET("/", func(c echo.Context) error {
 		return c.Render(200, "index", WishlistFormData{HasItems: false, HasId: false})
 	})
@@ -114,13 +120,26 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 	})
 
 	e.GET("/wishlist/:id", func(c echo.Context) error {
+		acceptLang := c.Request().Header.Get("Accept-Language")
+		acceptLang = acceptLang[:5]
+
+		cookieLang, _ := c.Cookie("lang")
+		if cookieLang != nil {
+			acceptLang = cookieLang.Value
+		}
+		lang := language.MustParse(acceptLang)
+		p := message.NewPrinter(lang)
+
 		id, error := strconv.Atoi(c.Param("id"))
 		if error != nil {
 			return error
 		}
 
 		if (id < 0) || (id >= len(repo.Wishlists)) {
-			return c.Render(200, "not-found", nil)
+			return c.Render(200, "not-found", NotFoundData{
+				NotFoundTitle:           p.Sprintf("Wishlist not found"),
+				CreateNewWishlistButton: p.Sprintf("Create new wishlist"),
+			})
 		}
 
 		wishlist := repo.Wishlists[id]
@@ -131,4 +150,9 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 
 		return c.Render(200, "index", MapWishlistToWishlistFormData(wishlist))
 	})
+}
+
+type NotFoundData struct {
+	NotFoundTitle           string
+	CreateNewWishlistButton string
 }

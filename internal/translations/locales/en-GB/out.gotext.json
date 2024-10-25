@@ -1,0 +1,19 @@
+{
+    "language": "en-GB",
+    "messages": [
+        {
+            "id": "Wishlist not found",
+            "message": "Wishlist not found",
+            "translation": "Wishlist not found",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Create new wishlist",
+            "message": "Create new wishlist",
+            "translation": "Create new wishlist",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        }
+    ]
+}

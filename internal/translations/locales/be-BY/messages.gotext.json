@@ -1,0 +1,15 @@
+{
+    "language": "be-BY",
+    "messages": [
+        {
+            "id": "Wishlist not found",
+            "message": "Wishlist not found",
+            "translation": "Спіс жаданняў не знойдзены"
+        },
+        {
+            "id": "Create new wishlist",
+            "message": "Create new wishlist",
+            "translation": "Стварыць новы спіс жаданняў"
+        }
+    ]
+}

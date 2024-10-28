@@ -43,7 +43,7 @@
           }
         },
         getShareUrl() {
-          return `http://localhost:1323/wishlist/${this.wishlistId}`;
+          return `{{ .BaseUrl }}/wishlist/${this.wishlistId}`;
         },
         copyShareUrlToClipboard() {
           navigator.clipboard.writeText(this.getShareUrl());

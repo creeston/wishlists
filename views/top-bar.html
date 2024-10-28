@@ -6,7 +6,7 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        <button x-show="isCreating" :disabled="!isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .SaveButtonTitle }}</button>
+        <button x-show="isCreating && isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .SaveButtonTitle }}</button>
         <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .EditButtonTitle }}</button>
       </li>
       <li>
@@ -47,7 +47,7 @@
 
 {{ block "app-title" . }}
   <li>
-    <a href="http://localhost:1323" class="secondary">
+    <a href="{{ .BaseUrl }}" class="secondary">
       <strong>Wishlist</strong>
     </a>
   </li>

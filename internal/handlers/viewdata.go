@@ -22,6 +22,7 @@ type WishlistFormData struct {
 	EditButtonTitle             string
 	Languages                   []LanguageData
 	SelectedLanguage            string
+	BaseUrl                     string
 }
 
 type WishlistFormItem struct {
@@ -37,6 +38,7 @@ type WishlistViewFormData struct {
 	EditButtonTitle  string
 	Languages        []LanguageData
 	SelectedLanguage string
+	BaseUrl          string
 }
 
 type WishlistCheckedItemData struct {
@@ -60,6 +62,7 @@ type NotFoundData struct {
 	CreateNewWishlistButton string
 	Languages               []LanguageData
 	SelectedLanguage        string
+	BaseUrl                 string
 }
 
 func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {

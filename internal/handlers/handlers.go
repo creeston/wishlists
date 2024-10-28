@@ -55,6 +55,7 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 				EditButtonTitle:             i18n.Sprintf("Edit"),
 				Languages:                   getLanguageList(i18n),
 				SelectedLanguage:            language,
+				BaseUrl:                     baseUrl,
 			})
 	})
 
@@ -73,6 +74,7 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 				CreateNewWishlistButton: i18n.Sprintf("Create new wishlist"),
 				Languages:               getLanguageList(i18n),
 				SelectedLanguage:        clientLanguage,
+				BaseUrl:                 baseUrl,
 			})
 		}
 
@@ -84,6 +86,7 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 			viewData.SaveButtonTitle = i18n.Sprintf("Save")
 			viewData.Languages = getLanguageList(i18n)
 			viewData.SelectedLanguage = clientLanguage
+			viewData.BaseUrl = baseUrl
 			return c.Render(200, "wishlist", viewData)
 		}
 
@@ -94,6 +97,7 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		formData.EditButtonTitle = i18n.Sprintf("Edit")
 		formData.Languages = getLanguageList(i18n)
 		formData.SelectedLanguage = clientLanguage
+		formData.BaseUrl = baseUrl
 		return c.Render(200, "index", formData)
 	})
 

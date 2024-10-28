@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"creeston/lists/internal/repository"
+	"creeston/lists/internal/utils"
+	"net/url"
 	"sort"
 	"strconv"
 
@@ -39,10 +41,22 @@ func getLanguageList(i18n *message.Printer) []LanguageData {
 	return languages
 }
 
-func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
+func GetPrinter(c echo.Context) *message.Printer {
+	return c.Get("i18n").(*message.Printer)
+}
+
+func GetClientLanguage(c echo.Context) string {
+	return c.Get("clientLanguage").(string)
+}
+
+func GetUserId(c echo.Context) string {
+	return c.Get("userId").(string)
+}
+
+func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl string) {
 	e.GET("/", func(c echo.Context) error {
-		i18n := c.Get("i18n").(*message.Printer)
-		language := c.Get("clientLanguage").(string)
+		i18n := GetPrinter(c)
+		language := GetClientLanguage(c)
 		return c.Render(
 			200,
 			"index",
@@ -60,45 +74,57 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 	})
 
 	e.GET("/wishlist/:id", func(c echo.Context) error {
-		i18n := c.Get("i18n").(*message.Printer)
-		clientLanguage := c.Get("clientLanguage").(string)
+		i18n := GetPrinter(c)
+		language := GetClientLanguage(c)
+		userId := GetUserId(c)
 
 		id, error := strconv.Atoi(c.Param("id"))
 		if error != nil {
 			return error
 		}
 
-		if (id < 0) || (id >= len(repo.Wishlists)) {
+		key := c.QueryParam("key")
+		wishlist := repo.GetWishlistByID(id)
+
+		if wishlist == nil {
 			return c.Render(200, "not-found", NotFoundData{
 				NotFoundTitle:           i18n.Sprintf("Wishlist not found"),
 				CreateNewWishlistButton: i18n.Sprintf("Create new wishlist"),
 				Languages:               getLanguageList(i18n),
-				SelectedLanguage:        clientLanguage,
+				SelectedLanguage:        language,
 				BaseUrl:                 baseUrl,
 			})
 		}
 
-		wishlist := repo.Wishlists[id]
-		userId := c.Get("userId").(string)
-		if userId != wishlist.CreatorId {
-			viewData := MapWishlistToWishlistViewFormData(wishlist, userId)
-			viewData.EditButtonTitle = i18n.Sprintf("Edit")
-			viewData.SaveButtonTitle = i18n.Sprintf("Save")
-			viewData.Languages = getLanguageList(i18n)
-			viewData.SelectedLanguage = clientLanguage
-			viewData.BaseUrl = baseUrl
-			return c.Render(200, "wishlist", viewData)
+		if wishlist.CreatorId == userId {
+			formData := MapWishlistToWishlistFormData(wishlist)
+			formData.CopyToClipboardTooltipLabel = i18n.Sprintf("Copy to clipboard")
+			formData.WishlistItemPlaceholder = i18n.Sprintf("Start typing...")
+			formData.SaveButtonTitle = i18n.Sprintf("Save")
+			formData.EditButtonTitle = i18n.Sprintf("Edit")
+			formData.Languages = getLanguageList(i18n)
+			formData.SelectedLanguage = language
+			formData.BaseUrl = baseUrl
+			return c.Render(200, "index", formData)
 		}
 
-		formData := MapWishlistToWishlistFormData(wishlist)
-		formData.CopyToClipboardTooltipLabel = i18n.Sprintf("Copy to clipboard")
-		formData.WishlistItemPlaceholder = i18n.Sprintf("Start typing...")
-		formData.SaveButtonTitle = i18n.Sprintf("Save")
-		formData.EditButtonTitle = i18n.Sprintf("Edit")
-		formData.Languages = getLanguageList(i18n)
-		formData.SelectedLanguage = clientLanguage
-		formData.BaseUrl = baseUrl
-		return c.Render(200, "index", formData)
+		if wishlist.Key != key {
+			return c.Render(200, "not-found", NotFoundData{
+				NotFoundTitle:           i18n.Sprintf("Wishlist not found"),
+				CreateNewWishlistButton: i18n.Sprintf("Create new wishlist"),
+				Languages:               getLanguageList(i18n),
+				SelectedLanguage:        language,
+				BaseUrl:                 baseUrl,
+			})
+		}
+
+		viewData := MapWishlistToWishlistViewFormData(wishlist, userId)
+		viewData.EditButtonTitle = i18n.Sprintf("Edit")
+		viewData.SaveButtonTitle = i18n.Sprintf("Save")
+		viewData.Languages = getLanguageList(i18n)
+		viewData.SelectedLanguage = language
+		viewData.BaseUrl = baseUrl
+		return c.Render(200, "wishlist", viewData)
 	})
 
 	e.POST("/wishlist", func(c echo.Context) error {
@@ -108,12 +134,17 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		}
 
 		items := ParseWishlistFormDataToWishlistItems(params)
-
 		if len(items) == 0 {
 			return c.String(400, "No items provided")
 		}
-		userId := c.Get("userId").(string)
-		wishlist := repo.AddWishlist(userId, items)
+
+		// TODO: Validate form
+		// Check for maximum number of items
+		// Check for maximum length of item text
+
+		userId := GetUserId(c)
+		wishlistKey := utils.GenerateUUID()
+		wishlist := repo.AddWishlist(userId, wishlistKey, items)
 
 		c.Response().Header().Set("HX-Redirect", "/wishlist/"+strconv.Itoa(wishlist.Id))
 		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(wishlist))
@@ -125,13 +156,13 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 			return error
 		}
 
-		wishlist := repo.GetWishlistByIdOrNull(id)
+		wishlist := repo.GetWishlistByID(id)
 
 		if wishlist == nil {
 			return c.String(404, "Wishlist not found")
 		}
 
-		userId := c.Get("userId").(string)
+		userId := GetUserId(c)
 		if userId != wishlist.CreatorId {
 			return c.String(403, "Forbidden")
 		}
@@ -147,17 +178,30 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 	})
 
 	e.PUT("/wishlist/:id/:itemId", func(c echo.Context) error {
+		i18n := GetPrinter(c)
+		userId := GetUserId(c)
+
 		id, error := strconv.Atoi(c.Param("id"))
 		if error != nil {
 			return error
 		}
+
+		// take hx-current-url from headers
+		currentUrl := c.Request().Header.Get("HX-Current-URL")
+		u, err := url.Parse(currentUrl)
+		if err != nil {
+			panic(err)
+		}
+
+		m, _ := url.ParseQuery(u.RawQuery)
+		key := m.Get("key")
 
 		itemId, error := strconv.Atoi(c.Param("itemId"))
 		if error != nil {
 			return error
 		}
 
-		wishlist := repo.GetWishlistByIdOrNull(id)
+		wishlist := repo.GetWishlistByID(id)
 		if wishlist == nil {
 			return c.String(404, "Wishlist not found")
 		}
@@ -166,8 +210,11 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 			return c.String(404, "Item not found")
 		}
 
+		if wishlist.Key != key {
+			return c.String(403, "Forbidden")
+		}
+
 		checkRequest := c.FormValue(("flag")) == "on"
-		userId := c.Get("userId").(string)
 		wishlistItem := wishlist.Items[itemId]
 		formData := WishlistCheckedItemData{
 			Index: wishlistItem.Index,
@@ -180,7 +227,6 @@ func SetupRoutes(e *echo.Echo, repo *repository.Data, baseUrl string) {
 		}
 
 		if checkRequest && wishlistItem.Checked && wishlistItem.CheckedById != userId {
-			i18n := c.Get("i18n").(*message.Printer)
 			viewData := WishlistAlredyCheckedItemData{
 				Index:                           wishlistItem.Index,
 				Text:                            wishlistItem.Text,

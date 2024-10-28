@@ -43,7 +43,7 @@
           }
         },
         getShareUrl() {
-          return `{{ .BaseUrl }}/wishlist/${this.wishlistId}`;
+          return `{{ .BaseUrl }}/wishlist/${this.wishlistId}?key={{ .Key }}`;
         },
         copyShareUrlToClipboard() {
           navigator.clipboard.writeText(this.getShareUrl());

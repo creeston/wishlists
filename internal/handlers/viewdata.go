@@ -16,6 +16,7 @@ type WishlistFormData struct {
 	HasItems                    bool
 	HasId                       bool
 	Id                          int
+	Key                         string
 	CopyToClipboardTooltipLabel string
 	WishlistItemPlaceholder     string
 	SaveButtonTitle             string
@@ -80,6 +81,7 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 		HasItems: true,
 		HasId:    true,
 		Id:       wishlist.Id,
+		Key:      wishlist.Key,
 	}
 }
 

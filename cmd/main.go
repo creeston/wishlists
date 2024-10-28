@@ -8,8 +8,8 @@ import (
 
 	"creeston/lists/internal/handlers"
 	"creeston/lists/internal/repository"
+	"creeston/lists/internal/utils"
 
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -38,7 +38,7 @@ func UserIdCookieHandler(next echo.HandlerFunc) echo.HandlerFunc {
 		userIdCookie, error := c.Cookie("wishlist_uid")
 		if error != nil {
 			if error == http.ErrNoCookie {
-				userId = uuid.New().String()
+				userId = utils.GenerateUUID()
 				c.SetCookie(&http.Cookie{
 					Name:  "wishlist_uid",
 					Value: userId,
@@ -88,7 +88,7 @@ func LanguageHandler(next echo.HandlerFunc) echo.HandlerFunc {
 func main() {
 	godotenv.Load()
 	e := echo.New()
-	data := repository.NewData()
+	repository := repository.NewInMemoryRepository()
 	baseUrl := os.Getenv("BASE_URL")
 	port := os.Getenv("PORT")
 
@@ -96,7 +96,7 @@ func main() {
 	e.Use(UserIdCookieHandler)
 	e.Use(LanguageHandler)
 	e.Renderer = NewTemplate()
-	handlers.SetupRoutes(e, data, baseUrl)
+	handlers.SetupRoutes(e, repository, baseUrl)
 	e.Static("/css", "css")
 	e.Logger.Fatal(e.Start(":" + port))
 }

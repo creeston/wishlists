@@ -50,9 +50,8 @@ body {
 }
 
 .input-container {
-  width: calc(100% - 40px);
+  width: 100%;
   display: inline-block;
-  margin-left: 10px;
 }
 
 .input-row {

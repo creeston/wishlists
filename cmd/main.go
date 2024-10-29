@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
 	"creeston/lists/internal/handlers"
 	"creeston/lists/internal/repository"
@@ -91,12 +92,29 @@ func main() {
 	repository := repository.NewInMemoryRepository()
 	baseUrl := os.Getenv("BASE_URL")
 	port := os.Getenv("PORT")
+	maxItemsCountValue := os.Getenv("MAX_ITEMS_COUNT")
+	maxItemLengthValue := os.Getenv("MAX_ITEM_LENGTH")
+
+	maxItemsCount, err := strconv.Atoi(maxItemsCountValue)
+	if err != nil {
+		panic(err)
+	}
+
+	maxItemLength, err := strconv.Atoi(maxItemLengthValue)
+	if err != nil {
+		panic(err)
+	}
+
+	validationConfig := handlers.ValidationConfig{
+		MaxItemsCount: maxItemsCount,
+		MaxItemLength: maxItemLength,
+	}
 
 	e.Use(middleware.Logger())
 	e.Use(UserIdCookieHandler)
 	e.Use(LanguageHandler)
 	e.Renderer = NewTemplate()
-	handlers.SetupRoutes(e, repository, baseUrl)
+	handlers.SetupRoutes(e, repository, baseUrl, validationConfig)
 	e.Static("/css", "css")
 	e.Logger.Fatal(e.Start(":" + port))
 }

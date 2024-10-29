@@ -7,13 +7,15 @@
     <ul class="edge-navbar-options">
       <li>
         <button x-show="isCreating && isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .SaveButtonTitle }}</button>
-        <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .EditButtonTitle }}</button>
-      </li>
-      <li>
-        {{ template "language-select" . }}
+        {{ if .HasId}}
+          <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .EditButtonTitle }}</button>
+        {{ end }}
       </li>
       <li>
         {{ template "theme-button" . }}
+      </li>
+      <li>
+        {{ template "language-select" . }}
       </li>
     </ul>
   </nav>
@@ -34,10 +36,10 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        {{ template "language-select" . }}
+        {{ template "theme-button" . }}
       </li>
       <li>
-        {{ template "theme-button" . }}
+        {{ template "language-select" . }}
       </li>
     </ul>
   </nav>

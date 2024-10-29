@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"creeston/lists/internal/domain"
 	"creeston/lists/internal/repository"
 	"creeston/lists/internal/utils"
+	"fmt"
 	"net/url"
 	"sort"
 	"strconv"
@@ -53,7 +55,7 @@ func GetUserId(c echo.Context) string {
 	return c.Get("userId").(string)
 }
 
-func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl string) {
+func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl string, validationConfig ValidationConfig) {
 	e.GET("/", func(c echo.Context) error {
 		i18n := GetPrinter(c)
 		language := GetClientLanguage(c)
@@ -70,6 +72,10 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 				Languages:                   getLanguageList(i18n),
 				SelectedLanguage:            language,
 				BaseUrl:                     baseUrl,
+				ValidationErrors: ValidationErrors{
+					FieldErrors: map[string]string{},
+					Errors:      map[string]string{},
+				},
 			})
 	})
 
@@ -133,20 +139,24 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return error
 		}
 
-		items := ParseWishlistFormDataToWishlistItems(params)
-		if len(items) == 0 {
-			return c.String(400, "No items provided")
+		i18n := GetPrinter(c)
+		items := ParseWishlistFormDataToNewWishlistItems(params)
+		validationErrors := validateWishlistFormData(items, i18n, validationConfig)
+		if validationErrors.AnyErrors() {
+			return c.Render(200, "wishlist-form", WishlistFormData{
+				HasItems:                false,
+				HasId:                   false,
+				ValidationErrors:        validationErrors,
+				WishlistItemPlaceholder: i18n.Sprintf("Start typing..."),
+			})
 		}
-
-		// TODO: Validate form
-		// Check for maximum number of items
-		// Check for maximum length of item text
 
 		userId := GetUserId(c)
 		wishlistKey := utils.GenerateUUID()
 		wishlist := repo.AddWishlist(userId, wishlistKey, items)
 
-		c.Response().Header().Set("HX-Redirect", "/wishlist/"+strconv.Itoa(wishlist.Id))
+		// c.Response().Header().Set("HX-Redirect", "/wishlist/"+strconv.Itoa(wishlist.Id))
+		c.Response().Header().Set("HX-Trigger", fmt.Sprintf("{\"wishlist-created\": %d}", wishlist.Id))
 		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(wishlist))
 	})
 
@@ -156,8 +166,9 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return error
 		}
 
-		wishlist := repo.GetWishlistByID(id)
+		i18n := GetPrinter(c)
 
+		wishlist := repo.GetWishlistByID(id)
 		if wishlist == nil {
 			return c.String(404, "Wishlist not found")
 		}
@@ -172,9 +183,18 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return error
 		}
 
-		items := ParseWishlistFormDataToWishlistItems(params)
-		repo.UpdateWishlistWithItems(id, items)
-		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(wishlist))
+		items := ParseWishlistFormDataToUpdatedWishlistItems(params)
+		wishlist.UpdateWishlistItems(items)
+		validationErrors := validateUpdateWishlistFormData(wishlist.Items, i18n, validationConfig)
+		if validationErrors.AnyErrors() {
+			formData := MapWishlistToWishlistFormData(wishlist)
+			formData.ValidationErrors = validationErrors
+			formData.WishlistItemPlaceholder = i18n.Sprintf("Start typing...")
+			return c.Render(200, "wishlist-form", formData)
+		}
+
+		updatedWishlist := repo.UpdateWishlist(id, wishlist)
+		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(updatedWishlist))
 	})
 
 	e.PUT("/wishlist/:id/:itemId", func(c echo.Context) error {
@@ -217,7 +237,7 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 		checkRequest := c.FormValue(("flag")) == "on"
 		wishlistItem := wishlist.Items[itemId]
 		formData := WishlistCheckedItemData{
-			Index: wishlistItem.Index,
+			Index: wishlistItem.Id,
 			Text:  wishlistItem.Text,
 			Id:    wishlist.Id,
 		}
@@ -228,7 +248,7 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		if checkRequest && wishlistItem.Checked && wishlistItem.CheckedById != userId {
 			viewData := WishlistAlredyCheckedItemData{
-				Index:                           wishlistItem.Index,
+				Index:                           wishlistItem.Id,
 				Text:                            wishlistItem.Text,
 				ItemWasAlreadyCheckedPopupTitle: i18n.Sprintf("Item was already taken"),
 				ItemWasAlreadyCheckedPopupText:  i18n.Sprintf("This item was already taken by another user"),
@@ -253,7 +273,51 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		wishlistItem.Checked = true
 		wishlistItem.CheckedById = userId
+		repo.UpdateWishlistItem(id, wishlistItem)
 		return c.Render(200, "wishlist-checked-item", formData)
 	})
+}
 
+func validateWishlistFormData(items []string, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {
+	var validationErrors = ValidationErrors{
+		FieldErrors: map[string]string{},
+		Errors:      map[string]string{},
+	}
+	for _, item := range items {
+		if len(item) > validationConfig.MaxItemLength {
+			validationErrors.FieldErrors[item] = i18n.Sprintf("Item text is too long. Maximum length is %d characters", validationConfig.MaxItemLength)
+		}
+	}
+
+	if len(items) > validationConfig.MaxItemsCount {
+		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d", validationConfig.MaxItemsCount)
+	}
+
+	if len(items) == 0 {
+		validationErrors.Errors["noItems"] = i18n.Sprintf("No items provided")
+	}
+
+	return validationErrors
+}
+
+func validateUpdateWishlistFormData(items []*domain.WishlistItem, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {
+	var validationErrors = ValidationErrors{
+		FieldErrors: map[string]string{},
+		Errors:      map[string]string{},
+	}
+	for _, item := range items {
+		if len(item.Text) > validationConfig.MaxItemLength {
+			validationErrors.FieldErrors[item.Text] = i18n.Sprintf("Item text is too long. Maximum length is %d characters", validationConfig.MaxItemLength)
+		}
+	}
+
+	if len(items) > validationConfig.MaxItemsCount {
+		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d", validationConfig.MaxItemsCount)
+	}
+
+	if len(items) == 0 {
+		validationErrors.Errors["noItems"] = i18n.Sprintf("No items provided")
+	}
+
+	return validationErrors
 }

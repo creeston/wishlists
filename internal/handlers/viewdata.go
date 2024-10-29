@@ -2,19 +2,33 @@ package handlers
 
 import (
 	"creeston/lists/internal/domain"
-	"sort"
 	"strconv"
 )
+
+type ValidationConfig struct {
+	MaxItemsCount int
+	MaxItemLength int
+}
 
 type LanguageData struct {
 	Language string
 	Code     string
 }
 
+type ValidationErrors struct {
+	FieldErrors map[string]string
+	Errors      map[string]string
+}
+
+func (v *ValidationErrors) AnyErrors() bool {
+	return len(v.Errors) > 0 || len(v.FieldErrors) > 0
+}
+
 type WishlistFormData struct {
 	Items                       []WishlistFormItem
 	HasItems                    bool
 	HasId                       bool
+	ValidationErrors            ValidationErrors
 	Id                          int
 	Key                         string
 	CopyToClipboardTooltipLabel string
@@ -27,7 +41,8 @@ type WishlistFormData struct {
 }
 
 type WishlistFormItem struct {
-	Index          int
+	Id             int
+	HasId          bool
 	Text           string
 	AlreadyChecked bool
 }
@@ -70,7 +85,8 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 	items := []WishlistFormItem{}
 	for _, item := range wishlist.Items {
 		items = append(items, WishlistFormItem{
-			Index:          item.Index,
+			Id:             item.Id,
+			HasId:          item.HasId,
 			Text:           item.Text,
 			AlreadyChecked: item.Checked,
 		})
@@ -82,6 +98,10 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 		HasId:    true,
 		Id:       wishlist.Id,
 		Key:      wishlist.Key,
+		ValidationErrors: ValidationErrors{
+			FieldErrors: map[string]string{},
+			Errors:      map[string]string{},
+		},
 	}
 }
 
@@ -89,7 +109,7 @@ func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string)
 	items := []WishlistCheckedItemData{}
 	for _, item := range wishlist.Items {
 		items = append(items, WishlistCheckedItemData{
-			Index:                item.Index,
+			Index:                item.Id,
 			Text:                 item.Text,
 			Id:                   wishlist.Id,
 			Checked:              item.Checked,
@@ -103,34 +123,61 @@ func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string)
 	}
 }
 
-func ParseWishlistFormDataToWishlistItems(data map[string][]string) []*domain.WishlistItem {
-	items := []*domain.WishlistItem{}
-	for key, value := range data {
-		if key[:4] != "item" {
-			continue
-		}
-
+func ParseWishlistFormDataToNewWishlistItems(data map[string][]string) []string {
+	items := []string{}
+	formValues := data["item"]
+	for _, value := range formValues {
 		if len(value) == 0 {
 			continue
 		}
 
-		text := value[0]
-		if text == "" {
+		if value == "" {
 			continue
 		}
 
-		indexStringValue := key[4:]
-		index, error := strconv.Atoi(indexStringValue)
-		if error != nil {
-			return nil
-		}
-
-		items = append(items, &domain.WishlistItem{Text: value[0], Index: index})
+		items = append(items, value)
 	}
 
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].Index < items[j].Index
-	})
+	return items
+}
+
+func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []domain.UpdateWishlistItem {
+	items := []domain.UpdateWishlistItem{}
+
+	for key, value := range data {
+		if key == "item" {
+			values := []string{}
+			for _, v := range value {
+				if v == "" {
+					continue
+				}
+				values = append(values, v)
+			}
+			for _, v := range values {
+				items = append(items, domain.UpdateWishlistItem{
+					Text:  v,
+					HasId: false,
+				})
+			}
+		} else if key[:4] == "item" {
+			idValue := key[5:]
+			id, err := strconv.Atoi(idValue)
+			if err != nil {
+				continue
+			}
+			value := value[0]
+			println(id)
+			println(value)
+			items = append(items, domain.UpdateWishlistItem{
+				Id:    id,
+				Text:  value,
+				HasId: true,
+			})
+		} else {
+			continue
+		}
+
+	}
 
 	return items
 }

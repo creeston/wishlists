@@ -6,9 +6,9 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        <button x-show="isCreating && isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .SaveButtonTitle }}</button>
+        <button x-show="isCreating && isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .Labels.SaveButtonTitle }}</button>
         {{ if .HasId}}
-          <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .EditButtonTitle }}</button>
+          <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .Labels.EditButtonTitle }}</button>
         {{ end }}
       </li>
       <li>
@@ -107,7 +107,7 @@
 {{ block "language-select" . }}
 <div x-data="getLanguageData()" >
   <select x-model="selectedLanguage" @change="onLanguageSelected($event.target.value)">
-    {{ range .Languages }}
+    {{ range .Labels.Languages }}
       <option value="{{ .Code }}" >{{ .Language }}</option>
     {{ end }}
   </select>
@@ -115,7 +115,7 @@
 <script>
   function getLanguageData () {
     return {
-      selectedLanguage: "{{ .SelectedLanguage }}",
+      selectedLanguage: "{{ .Labels.SelectedLanguage }}",
       onLanguageSelected(language) {
         setCookie("lang", language, 365);
         window.location.reload();

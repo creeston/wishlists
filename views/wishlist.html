@@ -116,11 +116,11 @@
   {{ template "wishlist-already-checked-item" . }}
   <dialog :open="modalOpened">
     <article>
-      <h2>{{ .ItemWasAlreadyCheckedPopupTitle }}</h2>
-      <p> {{ .ItemWasAlreadyCheckedPopupText }}</p>
+      <h2>{{ .Labels.ItemWasAlreadyCheckedPopupTitle }}</h2>
+      <p> {{ .Labels.ItemWasAlreadyCheckedPopupText }}</p>
       <footer>
         <button class="secondary" x-on:click="modalOpened = !modalOpened">
-          {{ .ItemWasAlreadyCheckedOkayButton }}
+          {{ .Labels.ItemWasAlreadyCheckedOkayButton }}
         </button>
       </footer>
     </article>

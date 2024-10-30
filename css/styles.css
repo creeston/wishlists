@@ -179,3 +179,8 @@ fieldset.wishlist-link button.clipboard-button {
 .crossed-text {
   text-decoration: line-through;
 }
+
+header {
+  position: relative;
+  z-index: 100;
+}

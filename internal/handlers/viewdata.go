@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"creeston/lists/internal/domain"
+	"sort"
 	"strconv"
+
+	"golang.org/x/text/message"
 )
 
 type ValidationConfig struct {
@@ -24,40 +27,93 @@ func (v *ValidationErrors) AnyErrors() bool {
 	return len(v.Errors) > 0 || len(v.FieldErrors) > 0
 }
 
-type WishlistFormData struct {
-	Items                       []WishlistFormItem
-	HasItems                    bool
-	HasId                       bool
-	ValidationErrors            ValidationErrors
-	Id                          int
-	Key                         string
-	CopyToClipboardTooltipLabel string
-	WishlistItemPlaceholder     string
-	SaveButtonTitle             string
-	EditButtonTitle             string
-	Languages                   []LanguageData
-	SelectedLanguage            string
-	BaseUrl                     string
+func getLanguageList(i18n *message.Printer) []LanguageData {
+	languages := []LanguageData{
+		{
+			Language: i18n.Sprintf("English"),
+			Code:     "en-GB",
+		},
+		{
+			Language: i18n.Sprintf("Russian"),
+			Code:     "ru-RU",
+		},
+		{
+			Language: i18n.Sprintf("Polish"),
+			Code:     "pl-PL",
+		},
+		{
+			Language: i18n.Sprintf("Belarusian"),
+			Code:     "be-BY",
+		},
+	}
+
+	sort.Slice(languages, func(i, j int) bool {
+		return languages[i].Language < languages[j].Language
+	})
+
+	return languages
 }
 
-type WishlistFormItem struct {
+func getLabelsData(i18n *message.Printer, selectedLanguage string) LabelsData {
+	labels := getLanguageList(i18n)
+	return LabelsData{
+		SelectedLanguage: selectedLanguage,
+		Languages:        labels,
+
+		CopyToClipboardTooltipLabel:     i18n.Sprintf("Copy to clipboard"),
+		WishlistItemPlaceholder:         i18n.Sprintf("Enter wishlist item"),
+		SaveButtonTitle:                 i18n.Sprintf("Save"),
+		EditButtonTitle:                 i18n.Sprintf("Edit"),
+		NotFoundTitle:                   i18n.Sprintf("Wishlist not found"),
+		CreateNewWishlistButton:         i18n.Sprintf("Create new wishlist"),
+		ItemWasAlreadyCheckedPopupTitle: i18n.Sprintf("Item was already checked"),
+		ItemWasAlreadyCheckedPopupText:  i18n.Sprintf("This item was already checked by another user"),
+		ItemWasAlreadyCheckedOkayButton: i18n.Sprintf("Okay"),
+	}
+}
+
+type LabelsData struct {
+	SelectedLanguage string
+	Languages        []LanguageData
+
+	CopyToClipboardTooltipLabel     string
+	WishlistItemPlaceholder         string
+	SaveButtonTitle                 string
+	EditButtonTitle                 string
+	NotFoundTitle                   string
+	CreateNewWishlistButton         string
+	ItemWasAlreadyCheckedPopupTitle string
+	ItemWasAlreadyCheckedPopupText  string
+	ItemWasAlreadyCheckedOkayButton string
+}
+
+type WishlistFormViewParams struct {
+	Items            []WishlistFormItemParams
+	HasItems         bool
+	Id               int
+	HasId            bool
+	Key              string
+	ValidationErrors ValidationErrors
+
+	BaseUrl string
+	Labels  LabelsData
+}
+
+type WishlistFormItemParams struct {
 	Id             int
 	HasId          bool
 	Text           string
 	AlreadyChecked bool
 }
 
-type WishlistViewFormData struct {
-	Items            []WishlistCheckedItemData
-	Id               int
-	SaveButtonTitle  string
-	EditButtonTitle  string
-	Languages        []LanguageData
-	SelectedLanguage string
-	BaseUrl          string
+type WishlistViewParams struct {
+	Items   []WishlistCheckableItemParams
+	Id      int
+	BaseUrl string
+	Labels  LabelsData
 }
 
-type WishlistCheckedItemData struct {
+type WishlistCheckableItemParams struct {
 	Index                int
 	Text                 string
 	Id                   int
@@ -65,26 +121,21 @@ type WishlistCheckedItemData struct {
 	CheckedByAnotherUser bool
 }
 
-type WishlistAlredyCheckedItemData struct {
-	Text                            string
-	Index                           int
-	ItemWasAlreadyCheckedPopupTitle string
-	ItemWasAlreadyCheckedPopupText  string
-	ItemWasAlreadyCheckedOkayButton string
+type WishlistAlredyCheckedItemParams struct {
+	Text   string
+	Index  int
+	Labels LabelsData
 }
 
-type NotFoundData struct {
-	NotFoundTitle           string
-	CreateNewWishlistButton string
-	Languages               []LanguageData
-	SelectedLanguage        string
-	BaseUrl                 string
+type NotFoundViewParams struct {
+	BaseUrl string
+	Labels  LabelsData
 }
 
-func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
-	items := []WishlistFormItem{}
+func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormViewParams {
+	items := []WishlistFormItemParams{}
 	for _, item := range wishlist.Items {
-		items = append(items, WishlistFormItem{
+		items = append(items, WishlistFormItemParams{
 			Id:             item.Id,
 			HasId:          item.HasId,
 			Text:           item.Text,
@@ -92,7 +143,7 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 		})
 	}
 
-	return WishlistFormData{
+	return WishlistFormViewParams{
 		Items:    items,
 		HasItems: true,
 		HasId:    true,
@@ -105,10 +156,10 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormData {
 	}
 }
 
-func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string) WishlistViewFormData {
-	items := []WishlistCheckedItemData{}
+func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string) WishlistViewParams {
+	items := []WishlistCheckableItemParams{}
 	for _, item := range wishlist.Items {
-		items = append(items, WishlistCheckedItemData{
+		items = append(items, WishlistCheckableItemParams{
 			Index:                item.Id,
 			Text:                 item.Text,
 			Id:                   wishlist.Id,
@@ -117,7 +168,7 @@ func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string)
 		})
 	}
 
-	return WishlistViewFormData{
+	return WishlistViewParams{
 		Items: items,
 		Id:    wishlist.Id,
 	}

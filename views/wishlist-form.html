@@ -95,12 +95,19 @@
             nextInput.focus();
           }
         },
+        focusOnPreviousInputElement(index) {
+          const previousInput = document.getElementById("input-" + (index - 1));
+          if (previousInput) {
+            previousInput.focus();
+          }
+        },
         removeIfAlreadyEmpty(index) {
           if (this.wishlistItems[index].Text.trim() !== "") {
             return;
           }
     
           if (index === this.wishlistItems.length - 1) {
+            this.focusOnPreviousInputElement(index);
             return;
           }
 

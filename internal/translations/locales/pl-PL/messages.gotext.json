@@ -2,6 +2,57 @@
     "language": "pl-PL",
     "messages": [
         {
+            "id": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
+            "message": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
+            "translation": "Tekst elementu ma {Text} znaków. Maksymalna długość to {MaxItemLength} znaków",
+            "placeholders": [
+                {
+                    "id": "Text",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "len(item.Text)"
+                },
+                {
+                    "id": "MaxItemLength",
+                    "string": "%[2]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 2,
+                    "expr": "validationConfig.MaxItemLength"
+                }
+            ]
+        },
+        {
+            "id": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
+            "message": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
+            "translation": "Maksymalna liczba elementów to {MaxItemsCount}, masz {Lenitems}.",
+            "placeholders": [
+                {
+                    "id": "MaxItemsCount",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "validationConfig.MaxItemsCount"
+                },
+                {
+                    "id": "Lenitems",
+                    "string": "%[2]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 2,
+                    "expr": "len(items)"
+                }
+            ]
+        },
+        {
+            "id": "No items provided",
+            "message": "No items provided",
+            "translation": "Nie podano elementów"
+        },
+        {
             "id": "English",
             "message": "English",
             "translation": "Angielski"
@@ -27,9 +78,9 @@
             "translation": "Kopiuj do schowka"
         },
         {
-            "id": "Start typing...",
-            "message": "Start typing...",
-            "translation": "Zacznij pisać..."
+            "id": "Enter wishlist item",
+            "message": "Enter wishlist item",
+            "translation": "Wprowadź tekst"
         },
         {
             "id": "Save",
@@ -52,14 +103,14 @@
             "translation": "Utwórz nową listę życzeń"
         },
         {
-            "id": "Item was already taken",
-            "message": "Item was already taken",
-            "translation": "Element został już zabrany"
+            "id": "Item was already checked",
+            "message": "Item was already checked",
+            "translation": "Element został już sprawdzony"
         },
         {
-            "id": "This item was already taken by another user",
-            "message": "This item was already taken by another user",
-            "translation": "Ten element został już zabrany przez innego użytkownika"
+            "id": "This item was already checked by another user",
+            "message": "This item was already checked by another user",
+            "translation": "Ten element został już sprawdzony przez innego użytkownika"
         },
         {
             "id": "Okay",

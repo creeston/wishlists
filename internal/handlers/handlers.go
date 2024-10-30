@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
 
@@ -94,8 +95,11 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		i18n := GetPrinter(c)
 		language := GetClientLanguage(c)
+		userId := GetUserId(c)
+		wishlistKey := utils.GenerateUUID()
 		items := ParseWishlistFormDataToNewWishlistItems(params)
-		validationErrors := validateWishlistFormData(items, i18n, validationConfig)
+		wishlist := domain.NewWishlist(userId, wishlistKey, items)
+		validationErrors := validateWishlistItems(wishlist.Items, i18n, validationConfig)
 		if validationErrors.AnyErrors() {
 			return c.Render(200, "wishlist-form", WishlistFormViewParams{
 				HasItems:         false,
@@ -105,9 +109,7 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			})
 		}
 
-		userId := GetUserId(c)
-		wishlistKey := utils.GenerateUUID()
-		wishlist := repo.AddWishlist(userId, wishlistKey, items)
+		wishlist = repo.AddWishlist(wishlist)
 
 		// Currently redirection implemented on the client side.
 		// If we need to immediately redirect user, we should uncomment it.
@@ -142,16 +144,18 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		items := ParseWishlistFormDataToUpdatedWishlistItems(params)
 		wishlist.UpdateWishlistItems(items)
-		validationErrors := validateUpdateWishlistFormData(wishlist.Items, i18n, validationConfig)
+		validationErrors := validateWishlistItems(wishlist.Items, i18n, validationConfig)
 		if validationErrors.AnyErrors() {
-			formData := MapWishlistToWishlistFormData(wishlist)
-			formData.ValidationErrors = validationErrors
-			formData.Labels = getLabelsData(i18n, GetClientLanguage(c))
-			return c.Render(200, "wishlist-form", formData)
+			formProps := MapWishlistToWishlistFormData(wishlist)
+			formProps.ValidationErrors = validationErrors
+			formProps.Labels = getLabelsData(i18n, GetClientLanguage(c))
+			return c.Render(200, "wishlist-form", formProps)
 		}
 
 		updatedWishlist := repo.UpdateWishlist(id, wishlist)
-		return c.Render(200, "wishlist-form", MapWishlistToWishlistFormData(updatedWishlist))
+		formProps := MapWishlistToWishlistFormData(updatedWishlist)
+		formProps.Labels = getLabelsData(i18n, GetClientLanguage(c))
+		return c.Render(200, "wishlist-form", formProps)
 	})
 
 	e.PUT("/wishlist/:id/:itemId", func(c echo.Context) error {
@@ -183,16 +187,17 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return c.String(404, "Wishlist not found")
 		}
 
-		if (itemId < 0) || (itemId >= len(wishlist.Items)) {
-			return c.String(404, "Item not found")
-		}
-
 		if wishlist.Key != key {
 			return c.String(403, "Forbidden")
 		}
 
+		wishlistItem := wishlist.GetItemByIndex(itemId)
+
+		if wishlistItem == nil {
+			return c.String(404, "Item not found")
+		}
+
 		checkRequest := c.FormValue(("flag")) == "on"
-		wishlistItem := wishlist.Items[itemId]
 		viewParams := WishlistCheckableItemParams{
 			Index: wishlistItem.Id,
 			Text:  wishlistItem.Text,
@@ -234,41 +239,20 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 	})
 }
 
-func validateWishlistFormData(items []string, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {
+func validateWishlistItems(items []*domain.WishlistItem, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {
 	var validationErrors = ValidationErrors{
 		FieldErrors: map[string]string{},
 		Errors:      map[string]string{},
 	}
 	for _, item := range items {
-		if len(item) > validationConfig.MaxItemLength {
-			validationErrors.FieldErrors[item] = i18n.Sprintf("Item text is too long. Maximum length is %d characters", validationConfig.MaxItemLength)
+		textLength := utf8.RuneCountInString(item.Text)
+		if textLength > validationConfig.MaxItemLength {
+			validationErrors.FieldErrors[item.Text] = i18n.Sprintf("Item text is %d characters long. Maximum length is %d characters", textLength, validationConfig.MaxItemLength)
 		}
 	}
 
 	if len(items) > validationConfig.MaxItemsCount {
-		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d", validationConfig.MaxItemsCount)
-	}
-
-	if len(items) == 0 {
-		validationErrors.Errors["noItems"] = i18n.Sprintf("No items provided")
-	}
-
-	return validationErrors
-}
-
-func validateUpdateWishlistFormData(items []*domain.WishlistItem, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {
-	var validationErrors = ValidationErrors{
-		FieldErrors: map[string]string{},
-		Errors:      map[string]string{},
-	}
-	for _, item := range items {
-		if len(item.Text) > validationConfig.MaxItemLength {
-			validationErrors.FieldErrors[item.Text] = i18n.Sprintf("Item text is too long. Maximum length is %d characters", validationConfig.MaxItemLength)
-		}
-	}
-
-	if len(items) > validationConfig.MaxItemsCount {
-		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d", validationConfig.MaxItemsCount)
+		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d, you have %d.", validationConfig.MaxItemsCount, len(items))
 	}
 
 	if len(items) == 0 {

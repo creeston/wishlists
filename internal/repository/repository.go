@@ -5,7 +5,7 @@ import (
 )
 
 type WishlistRepository interface {
-	AddWishlist(userID string, wishlistKey string, items []string) *domain.Wishlist
+	AddWishlist(wishlist *domain.Wishlist) *domain.Wishlist
 	GetWishlistByID(id int) *domain.Wishlist
 	UpdateWishlist(id int, wishlist *domain.Wishlist) *domain.Wishlist
 	UpdateWishlistItem(id int, item *domain.WishlistItem) *domain.WishlistItem
@@ -20,29 +20,37 @@ func NewInMemoryRepository() *InMemoryRepository {
 		wishlists: make([]*domain.Wishlist, 0),
 	}
 
-	repository.AddWishlist("default", "public", []string{
-		"Cake",
+	wishlist := domain.NewWishlist("default", "public", []string{"Cake",
 		"Candles",
 		"Balloons",
 		"Presents. A lot a lot a lof a very long list of presents please!",
 	})
 
+	repository.AddWishlist(wishlist)
 	return repository
 }
 
-func (r *InMemoryRepository) AddWishlist(userID string, wishlistKey string, items []string) *domain.Wishlist {
+func (r *InMemoryRepository) AddWishlist(wishlist *domain.Wishlist) *domain.Wishlist {
 	id := len(r.wishlists)
-	wishlistItems := make([]*domain.WishlistItem, 0)
-	for i, item := range items {
-		wishlistItems = append(wishlistItems, &domain.WishlistItem{
-			Text:  item,
+	items := make([]*domain.WishlistItem, 0)
+
+	for i, item := range wishlist.Items {
+		items = append(items, &domain.WishlistItem{
+			Text:  item.Text,
 			Id:    i,
 			HasId: true,
 		})
 	}
-	wishlist := domain.NewWishlist(wishlistItems, id, userID, wishlistKey)
-	r.wishlists = append(r.wishlists, wishlist)
-	return wishlist
+
+	newWishlist := &domain.Wishlist{
+		Items:     items,
+		Id:        id,
+		CreatorId: wishlist.CreatorId,
+		Key:       wishlist.Key,
+	}
+
+	r.wishlists = append(r.wishlists, newWishlist)
+	return r.GetWishlistByID(newWishlist.Id)
 }
 
 func (r *InMemoryRepository) GetWishlistByID(id int) *domain.Wishlist {

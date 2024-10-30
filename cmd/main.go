@@ -17,6 +17,7 @@ import (
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"golang.org/x/time/rate"
 )
 
 type Templates struct {
@@ -94,6 +95,8 @@ func main() {
 	port := os.Getenv("PORT")
 	maxItemsCountValue := os.Getenv("MAX_ITEMS_COUNT")
 	maxItemLengthValue := os.Getenv("MAX_ITEM_LENGTH")
+	maxBodySizeValue := os.Getenv("MAX_BODY_SIZE")
+	maxRateLimitValue := os.Getenv("MAX_RATE_LIMIT")
 
 	maxItemsCount, err := strconv.Atoi(maxItemsCountValue)
 	if err != nil {
@@ -105,11 +108,18 @@ func main() {
 		panic(err)
 	}
 
+	maxRateLimit, err := strconv.Atoi(maxRateLimitValue)
+	if err != nil {
+		panic(err)
+	}
+
 	validationConfig := handlers.ValidationConfig{
 		MaxItemsCount: maxItemsCount,
 		MaxItemLength: maxItemLength,
 	}
 
+	e.Use(middleware.BodyLimit(maxBodySizeValue))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(maxRateLimit))))
 	e.Use(middleware.Logger())
 	e.Use(UserIdCookieHandler)
 	e.Use(LanguageHandler)

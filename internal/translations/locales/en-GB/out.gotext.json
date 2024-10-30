@@ -2,6 +2,63 @@
     "language": "en-GB",
     "messages": [
         {
+            "id": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
+            "message": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
+            "translation": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Text",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "len(item.Text)"
+                },
+                {
+                    "id": "MaxItemLength",
+                    "string": "%[2]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 2,
+                    "expr": "validationConfig.MaxItemLength"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
+            "message": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
+            "translation": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "MaxItemsCount",
+                    "string": "%[1]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 1,
+                    "expr": "validationConfig.MaxItemsCount"
+                },
+                {
+                    "id": "Lenitems",
+                    "string": "%[2]d",
+                    "type": "int",
+                    "underlyingType": "int",
+                    "argNum": 2,
+                    "expr": "len(items)"
+                }
+            ],
+            "fuzzy": true
+        },
+        {
+            "id": "No items provided",
+            "message": "No items provided",
+            "translation": "No items provided",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
             "id": "English",
             "message": "English",
             "translation": "English",
@@ -37,9 +94,9 @@
             "fuzzy": true
         },
         {
-            "id": "Start typing...",
-            "message": "Start typing...",
-            "translation": "Start typing...",
+            "id": "Enter wishlist item",
+            "message": "Enter wishlist item",
+            "translation": "Enter wishlist item",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
@@ -72,16 +129,16 @@
             "fuzzy": true
         },
         {
-            "id": "Item was already taken",
-            "message": "Item was already taken",
-            "translation": "Item was already taken",
+            "id": "Item was already checked",
+            "message": "Item was already checked",
+            "translation": "Item was already checked",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },
         {
-            "id": "This item was already taken by another user",
-            "message": "This item was already taken by another user",
-            "translation": "This item was already taken by another user",
+            "id": "This item was already checked by another user",
+            "message": "This item was already checked by another user",
+            "translation": "This item was already checked by another user",
             "translatorComment": "Copied from source.",
             "fuzzy": true
         },

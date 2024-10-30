@@ -41,71 +41,88 @@ func init() {
 }
 
 var messageKeyToIndex = map[string]int{
-	"Belarusian":             3,
-	"Copy to clipboard":      4,
-	"Create new wishlist":    9,
-	"Edit":                   7,
-	"English":                0,
-	"Item was already taken": 10,
-	"Okay":                   12,
-	"Polish":                 2,
-	"Russian":                1,
-	"Save":                   6,
-	"Start typing...":        5,
-	"This item was already taken by another user": 11,
-	"Wishlist not found":                          8,
+	"Belarusian":          6,
+	"Copy to clipboard":   7,
+	"Create new wishlist": 12,
+	"Edit":                10,
+	"English":             3,
+	"Enter wishlist item": 8,
+	"Item text is %d characters long. Maximum length is %d characters": 0,
+	"Item was already checked":                    13,
+	"Maximum number of items is %d, you have %d.": 1,
+	"No items provided":                           2,
+	"Okay":                                        15,
+	"Polish":                                      5,
+	"Russian":                                     4,
+	"Save":                                        9,
+	"This item was already checked by another user": 14,
+	"Wishlist not found":                            11,
 }
 
-var be_BYIndex = []uint32{ // 14 elements
-	0x00000000, 0x00000015, 0x00000022, 0x00000033,
-	0x00000048, 0x00000078, 0x00000097, 0x000000a8,
-	0x000000bd, 0x000000ef, 0x00000123, 0x0000014b,
-	0x000001a4, 0x000001af,
-} // Size: 80 bytes
+var be_BYIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000084, 0x000000dd, 0x00000106,
+	0x0000011b, 0x00000128, 0x00000139, 0x0000014e,
+	0x0000017e, 0x0000019e, 0x000001af, 0x000001c4,
+	0x000001f6, 0x0000022a, 0x00000253, 0x000002a5,
+	0x000002b0,
+} // Size: 92 bytes
 
-const be_BYData string = "" + // Size: 431 bytes
-	"\x02Англійская\x02Руская\x02Польская\x02Беларуская\x02Скапіяваць у буфер" +
-	" абмену\x02Пачніце пісаць...\x02Захаваць\x02Рэдагаваць\x02Спіс жаданняў " +
-	"не знойдзены\x02Стварыць новы спіс жаданняў\x02Элемент ужо быў узяты" +
-	"\x02Гэты элемент ужо быў узяты іншым карыстальнікам\x02Добра"
+const be_BYData string = "" + // Size: 688 bytes
+	"\x02Тэкст элемента складае %[1]d сімвалаў. Максімальная даўжыня - %[2]d " +
+	"сімвалаў\x02Максімальная колькасць элементаў - %[1]d, у вас %[2]d.\x02Э" +
+	"лементы не зададзены\x02Англійская\x02Руская\x02Польская\x02Беларуская" +
+	"\x02Скапіяваць у буфер абмену\x02Увядзіце элемент\x02Захаваць\x02Рэдагав" +
+	"аць\x02Спіс жаданняў не знойдзены\x02Стварыць новы спіс жаданняў\x02Эле" +
+	"мент ужо правераны\x02Гэты элемент ужо ўзяты іншым карыстальнікам\x02До" +
+	"бра"
 
-var en_GBIndex = []uint32{ // 14 elements
-	0x00000000, 0x00000008, 0x00000010, 0x00000017,
-	0x00000022, 0x00000034, 0x00000044, 0x00000049,
-	0x0000004e, 0x00000061, 0x00000075, 0x0000008c,
-	0x000000b8, 0x000000bd,
-} // Size: 80 bytes
+var en_GBIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000047, 0x00000079, 0x0000008b,
+	0x00000093, 0x0000009b, 0x000000a2, 0x000000ad,
+	0x000000bf, 0x000000d3, 0x000000d8, 0x000000dd,
+	0x000000f0, 0x00000104, 0x0000011d, 0x0000014b,
+	0x00000150,
+} // Size: 92 bytes
 
-const en_GBData string = "" + // Size: 189 bytes
-	"\x02English\x02Russian\x02Polish\x02Belarusian\x02Copy to clipboard\x02S" +
-	"tart typing...\x02Save\x02Edit\x02Wishlist not found\x02Create new wishl" +
-	"ist\x02Item was already taken\x02This item was already taken by another " +
-	"user\x02Okay"
+const en_GBData string = "" + // Size: 336 bytes
+	"\x02Item text is %[1]d characters long. Maximum length is %[2]d characte" +
+	"rs\x02Maximum number of items is %[1]d, you have %[2]d.\x02No items prov" +
+	"ided\x02English\x02Russian\x02Polish\x02Belarusian\x02Copy to clipboard" +
+	"\x02Enter wishlist item\x02Save\x02Edit\x02Wishlist not found\x02Create " +
+	"new wishlist\x02Item was already checked\x02This item was already checke" +
+	"d by another user\x02Okay"
 
-var pl_PLIndex = []uint32{ // 14 elements
-	0x00000000, 0x0000000a, 0x00000013, 0x0000001a,
-	0x00000026, 0x00000038, 0x0000004a, 0x00000051,
-	0x00000058, 0x00000076, 0x00000094, 0x000000b1,
-	0x000000ec, 0x000000ef,
-} // Size: 80 bytes
+var pl_PLIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000048, 0x0000007b, 0x00000091,
+	0x0000009b, 0x000000a4, 0x000000ab, 0x000000b7,
+	0x000000c9, 0x000000d9, 0x000000e0, 0x000000e7,
+	0x00000105, 0x00000123, 0x00000143, 0x00000181,
+	0x00000184,
+} // Size: 92 bytes
 
-const pl_PLData string = "" + // Size: 239 bytes
-	"\x02Angielski\x02Rosyjski\x02Polski\x02Białoruski\x02Kopiuj do schowka" +
-	"\x02Zacznij pisać...\x02Zapisz\x02Edytuj\x02Lista życzeń nie znaleziona" +
-	"\x02Utwórz nową listę życzeń\x02Element został już zabrany\x02Ten elemen" +
-	"t został już zabrany przez innego użytkownika\x02OK"
+const pl_PLData string = "" + // Size: 388 bytes
+	"\x02Tekst elementu ma %[1]d znaków. Maksymalna długość to %[2]d znaków" +
+	"\x02Maksymalna liczba elementów to %[1]d, masz %[2]d.\x02Nie podano elem" +
+	"entów\x02Angielski\x02Rosyjski\x02Polski\x02Białoruski\x02Kopiuj do scho" +
+	"wka\x02Wprowadź tekst\x02Zapisz\x02Edytuj\x02Lista życzeń nie znaleziona" +
+	"\x02Utwórz nową listę życzeń\x02Element został już sprawdzony\x02Ten ele" +
+	"ment został już sprawdzony przez innego użytkownika\x02OK"
 
-var ru_RUIndex = []uint32{ // 14 elements
-	0x00000000, 0x00000015, 0x00000024, 0x00000035,
-	0x0000004c, 0x0000007e, 0x000000a1, 0x000000b4,
-	0x000000cf, 0x000000fd, 0x00000133, 0x00000159,
-	0x000001b0, 0x000001b9,
-} // Size: 80 bytes
+var ru_RUIndex = []uint32{ // 17 elements
+	0x00000000, 0x00000086, 0x000000e1, 0x00000104,
+	0x00000119, 0x00000128, 0x00000139, 0x00000150,
+	0x00000182, 0x0000019e, 0x000001b1, 0x000001cc,
+	0x000001fa, 0x00000230, 0x00000256, 0x000002ad,
+	0x000002b6,
+} // Size: 92 bytes
 
-const ru_RUData string = "" + // Size: 441 bytes
-	"\x02Английский\x02Русский\x02Польский\x02Белорусский\x02Скопировать в бу" +
-	"фер обмена\x02Начните печатать...\x02Сохранить\x02Редактировать\x02Спис" +
-	"ок желаний не найден\x02Создать новый список желаний\x02Элемент уже был" +
-	" взят\x02Этот элемент уже был взят другим пользователем\x02Окей"
+const ru_RUData string = "" + // Size: 694 bytes
+	"\x02Текст элемента составляет %[1]d символов. Максимальная длина - %[2]d" +
+	" символов\x02Максимальное количество элементов - %[1]d, у вас %[2]d.\x02" +
+	"Элементы не заданы\x02Английский\x02Русский\x02Польский\x02Белорусский" +
+	"\x02Скопировать в буфер обмена\x02Начните писать\x02Сохранить\x02Редакти" +
+	"ровать\x02Список желаний не найден\x02Создать новый список желаний\x02Э" +
+	"лемент уже был взят\x02Этот элемент уже был взят другим пользователем" +
+	"\x02Окей"
 
-	// Total table size 1620 bytes (1KiB); checksum: B5AA50E7
+	// Total table size 2474 bytes (2KiB); checksum: 2D0696B9

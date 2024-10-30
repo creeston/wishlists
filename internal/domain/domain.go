@@ -23,10 +23,17 @@ type Wishlist struct {
 
 type Wishlists = []*Wishlist
 
-func NewWishlist(items []*WishlistItem, id int, userId string, wishlistKey string) *Wishlist {
+func NewWishlist(userId string, wishlistKey string, items []string) *Wishlist {
+	wishlistItems := make([]*WishlistItem, 0)
+	for _, item := range items {
+		wishlistItems = append(wishlistItems, &WishlistItem{
+			Text:  item,
+			HasId: false,
+		})
+	}
+
 	return &Wishlist{
-		Items:     items,
-		Id:        id,
+		Items:     wishlistItems,
 		CreatorId: userId,
 		Key:       wishlistKey,
 	}

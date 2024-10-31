@@ -8,6 +8,7 @@
   hx-post="/wishlist"
   {{ end }}
   @wishlist-created="onWishlistCreated($event)"
+  @htmx:after-request="handleResponseStatus()"
   hx-swap="outerHTML"
   autocomplete="off" 
 >
@@ -40,6 +41,17 @@
       </div>
     </template>
   </div>
+  <dialog :open="tooManyRequestsDialogOpened">
+    <article>
+      <h2>{{ .Labels.TooManyRequestsTitle }}</h2>
+      <p> {{ .Labels.TooManyRequestsText }}</p>
+      <footer>
+        <button class="secondary" x-on:click.prevent="tooManyRequestsDialogOpened = false">
+          {{ .Labels.ItemWasAlreadyCheckedOkayButton }}
+        </button>
+      </footer>
+    </article>
+  </dialog>
   <script>
     function wishlistFormData() {
       return {
@@ -51,6 +63,7 @@
         inputLengths: [],
         fieldValidationErrors: {{ .ValidationErrors.FieldErrors }},
         formValidationErrors: {{ .ValidationErrors.Errors }},
+        tooManyRequestsDialogOpened: false,
         initializeFormValues() {
         {{ if .HasItems }}
           this.isSaveEnabled = true;
@@ -166,6 +179,11 @@
             HasId: false
           });
           this.inputLengths.push(0);
+        },
+        handleResponseStatus() {
+          if (event.detail.xhr.status === 429) {
+            this.tooManyRequestsDialogOpened = true;
+          }
         }
       };
     }

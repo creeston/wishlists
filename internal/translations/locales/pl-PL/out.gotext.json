@@ -116,6 +116,16 @@
             "id": "Got it",
             "message": "Got it",
             "translation": "Rozumiem"
+        },
+        {
+            "id": "You are making too many requests!",
+            "message": "You are making too many requests!",
+            "translation": "Wysyłasz zbyt wiele żądań!"
+        },
+        {
+            "id": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "message": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "translation": "Osiągnięto limit tworzenia list życzeń. Proszę chwilę poczekać."
         }
     ]
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"creeston/lists/internal/handlers"
 	"creeston/lists/internal/repository"
@@ -96,7 +97,6 @@ func main() {
 	maxItemsCountValue := os.Getenv("MAX_ITEMS_COUNT")
 	maxItemLengthValue := os.Getenv("MAX_ITEM_LENGTH")
 	maxBodySizeValue := os.Getenv("MAX_BODY_SIZE")
-	maxRateLimitValue := os.Getenv("MAX_RATE_LIMIT")
 	useInMemoryDb := os.Getenv("USE_IN_MEMORY_DB")
 
 	maxItemsCount, err := strconv.Atoi(maxItemsCountValue)
@@ -109,18 +109,14 @@ func main() {
 		panic(err)
 	}
 
-	maxRateLimit, err := strconv.Atoi(maxRateLimitValue)
-	if err != nil {
-		panic(err)
-	}
-
 	validationConfig := handlers.ValidationConfig{
 		MaxItemsCount: maxItemsCount,
 		MaxItemLength: maxItemLength,
 	}
 
 	e.Use(middleware.BodyLimit(maxBodySizeValue))
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(maxRateLimit))))
+	e.Use(CreateWishlistCreateRateLimiter())
+	e.Use(CreateGlobalRateLimiter())
 	e.Use(middleware.Logger())
 	e.Use(UserIdCookieHandler)
 	e.Use(LanguageHandler)
@@ -137,4 +133,39 @@ func main() {
 	e.Static("/css", "static/css")
 	e.Static("/icons", "static/icons")
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+func CreateGlobalRateLimiter() echo.MiddlewareFunc {
+	return middleware.RateLimiter(middleware.NewRateLimiterMemoryStoreWithConfig(
+		middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(5), Burst: 5, ExpiresIn: 3 * time.Minute},
+	))
+}
+
+func CreateWishlistCreateRateLimiter() echo.MiddlewareFunc {
+	wishlistCreateRateLimiterConfig := middleware.RateLimiterConfig{
+		Skipper: WishlistCreateEndpointSkipper,
+		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
+			middleware.RateLimiterMemoryStoreConfig{Rate: rate.Every(time.Hour), Burst: 2, ExpiresIn: 3 * time.Hour},
+		),
+		IdentifierExtractor: func(ctx echo.Context) (string, error) {
+			id := ctx.RealIP()
+			return id, nil
+		},
+		ErrorHandler: func(context echo.Context, err error) error {
+			return context.JSON(http.StatusForbidden, nil)
+		},
+		DenyHandler: func(context echo.Context, identifier string, err error) error {
+			return context.JSON(http.StatusTooManyRequests, nil)
+		},
+	}
+
+	return middleware.RateLimiterWithConfig(wishlistCreateRateLimiterConfig)
+}
+
+func WishlistCreateEndpointSkipper(c echo.Context) bool {
+	if c.Request().Method == http.MethodPost && c.Path() == "/wishlist" {
+		return false
+	}
+
+	return true
 }

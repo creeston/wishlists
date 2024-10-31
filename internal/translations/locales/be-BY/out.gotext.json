@@ -116,6 +116,16 @@
             "id": "Got it",
             "message": "Got it",
             "translation": "Зразумела"
+        },
+        {
+            "id": "You are making too many requests!",
+            "message": "You are making too many requests!",
+            "translation": "Вы адпраўляеце занадта шмат запытаў!"
+        },
+        {
+            "id": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "message": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "translation": "Вы дасягнулі мяжы стварэння спісаў пажаданняў. Калі ласка, пачакайце крыху."
         }
     ]
 }

@@ -148,6 +148,20 @@
             "translation": "Got it",
             "translatorComment": "Copied from source.",
             "fuzzy": true
+        },
+        {
+            "id": "You are making too many requests!",
+            "message": "You are making too many requests!",
+            "translation": "You are making too many requests!",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "message": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "translation": "You have reached the limit for creating wishlists. Please wait a moment.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
         }
     ]
 }

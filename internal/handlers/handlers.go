@@ -245,12 +245,12 @@ func validateWishlistItems(items []*domain.WishlistItem, i18n *message.Printer, 
 	for _, item := range items {
 		textLength := utf8.RuneCountInString(item.Text)
 		if textLength > validationConfig.MaxItemLength {
-			validationErrors.FieldErrors[item.Text] = i18n.Sprintf("Item text is %d characters long. Maximum length is %d characters", textLength, validationConfig.MaxItemLength)
+			validationErrors.FieldErrors[item.Text] = i18n.Sprintf("Your text is %d characters; max is %d", textLength, validationConfig.MaxItemLength)
 		}
 	}
 
 	if len(items) > validationConfig.MaxItemsCount {
-		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Maximum number of items is %d, you have %d.", validationConfig.MaxItemsCount, len(items))
+		validationErrors.Errors["maxItemsCount"] = i18n.Sprintf("Max items: %d. You added %d.", validationConfig.MaxItemsCount, len(items))
 	}
 
 	if len(items) == 0 {

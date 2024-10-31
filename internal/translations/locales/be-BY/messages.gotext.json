@@ -2,17 +2,17 @@
     "language": "be-BY",
     "messages": [
         {
-            "id": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
-            "message": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
-            "translation": "Тэкст элемента складае {Text} сімвалаў. Максімальная даўжыня - {MaxItemLength} сімвалаў",
+            "id": "Your text is {TextLength} characters; max is {MaxItemLength}",
+            "message": "Your text is {TextLength} characters; max is {MaxItemLength}",
+            "translation": "Даўжыня тэксту {TextLength} знакаў; максімум — {MaxItemLength}",
             "placeholders": [
                 {
-                    "id": "Text",
+                    "id": "TextLength",
                     "string": "%[1]d",
                     "type": "int",
                     "underlyingType": "int",
                     "argNum": 1,
-                    "expr": "len(item.Text)"
+                    "expr": "textLength"
                 },
                 {
                     "id": "MaxItemLength",
@@ -25,9 +25,9 @@
             ]
         },
         {
-            "id": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
-            "message": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
-            "translation": "Максімальная колькасць элементаў - {MaxItemsCount}, у вас {Lenitems}.",
+            "id": "Max items: {MaxItemsCount}. You added {Lenitems}.",
+            "message": "Max items: {MaxItemsCount}. You added {Lenitems}.",
+            "translation": "Максімум элементаў: {MaxItemsCount}. Вы дадалі {Lenitems}.",
             "placeholders": [
                 {
                     "id": "MaxItemsCount",
@@ -73,14 +73,14 @@
             "translation": "Беларуская"
         },
         {
-            "id": "Copy to clipboard",
-            "message": "Copy to clipboard",
-            "translation": "Скапіяваць у буфер абмену"
+            "id": "Copy link to share",
+            "message": "Copy link to share",
+            "translation": "Скапіраваць спасылку для адпраўкі"
         },
         {
-            "id": "Enter wishlist item",
-            "message": "Enter wishlist item",
-            "translation": "Увядзіце элемент"
+            "id": "Add a wish",
+            "message": "Add a wish",
+            "translation": "Дадайце пажаданне"
         },
         {
             "id": "Save",
@@ -95,27 +95,27 @@
         {
             "id": "Wishlist not found",
             "message": "Wishlist not found",
-            "translation": "Спіс жаданняў не знойдзены"
+            "translation": "Спіс пажаданняў не знойдзены"
         },
         {
-            "id": "Create new wishlist",
-            "message": "Create new wishlist",
-            "translation": "Стварыць новы спіс жаданняў"
+            "id": "Create a new wishlist",
+            "message": "Create a new wishlist",
+            "translation": "Стварыць новы спіс пажаданняў"
         },
         {
-            "id": "Item was already checked",
-            "message": "Item was already checked",
-            "translation": "Элемент ужо правераны"
+            "id": "This item is already reserved",
+            "message": "This item is already reserved",
+            "translation": "Гэты пункт ужо зарэзерваваны"
         },
         {
-            "id": "This item was already checked by another user",
-            "message": "This item was already checked by another user",
-            "translation": "Гэты элемент ужо ўзяты іншым карыстальнікам"
+            "id": "This item is already taken by another user",
+            "message": "This item is already taken by another user",
+            "translation": "Гэты падарунак ужо зарэзерваваны іншым карыстальнікам"
         },
         {
-            "id": "Okay",
-            "message": "Okay",
-            "translation": "Добра"
+            "id": "Got it",
+            "message": "Got it",
+            "translation": "Зразумела"
         }
     ]
 }

@@ -30,7 +30,7 @@
             x-on:keydown.backspace="removeIfAlreadyEmpty(index)" 
             :name="item.HasId === false ? 'item' : 'item-' + item.Id" 
             type="text"
-            :placeholder="index === 0 ? '1. {{ .Labels.WishlistItemPlaceholder }}' : '{{ .Labels.WishlistItemPlaceholder }}'"
+            placeholder="{{ .Labels.WishlistItemPlaceholder }}"
             :aria-invalid="fieldValidationErrors && fieldValidationErrors[item.Text] ? 'true' : ''"
             :aria-describedby="'invalid-helper' + index" />
           <small :id="'invalid-helper' + index" x-show="fieldValidationErrors"

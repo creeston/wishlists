@@ -60,15 +60,15 @@ func getLabelsData(i18n *message.Printer, selectedLanguage string) LabelsData {
 		SelectedLanguage: selectedLanguage,
 		Languages:        labels,
 
-		CopyToClipboardTooltipLabel:     i18n.Sprintf("Copy to clipboard"),
-		WishlistItemPlaceholder:         i18n.Sprintf("Enter wishlist item"),
+		CopyToClipboardTooltipLabel:     i18n.Sprintf("Copy link to share"),
+		WishlistItemPlaceholder:         i18n.Sprintf("Add a wish"),
 		SaveButtonTitle:                 i18n.Sprintf("Save"),
 		EditButtonTitle:                 i18n.Sprintf("Edit"),
 		NotFoundTitle:                   i18n.Sprintf("Wishlist not found"),
-		CreateNewWishlistButton:         i18n.Sprintf("Create new wishlist"),
-		ItemWasAlreadyCheckedPopupTitle: i18n.Sprintf("Item was already checked"),
-		ItemWasAlreadyCheckedPopupText:  i18n.Sprintf("This item was already checked by another user"),
-		ItemWasAlreadyCheckedOkayButton: i18n.Sprintf("Okay"),
+		CreateNewWishlistButton:         i18n.Sprintf("Create a new wishlist"),
+		ItemWasAlreadyCheckedPopupTitle: i18n.Sprintf("This item is already reserved"),
+		ItemWasAlreadyCheckedPopupText:  i18n.Sprintf("This item is already taken by another user"),
+		ItemWasAlreadyCheckedOkayButton: i18n.Sprintf("Got it"),
 	}
 }
 

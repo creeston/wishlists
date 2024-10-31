@@ -2,17 +2,17 @@
     "language": "pl-PL",
     "messages": [
         {
-            "id": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
-            "message": "Item text is {Text} characters long. Maximum length is {MaxItemLength} characters",
-            "translation": "Tekst elementu ma {Text} znaków. Maksymalna długość to {MaxItemLength} znaków",
+            "id": "Your text is {TextLength} characters; max is {MaxItemLength}",
+            "message": "Your text is {TextLength} characters; max is {MaxItemLength}",
+            "translation": "Twój tekst ma {TextLength} znaków; maksimum to {MaxItemLength}",
             "placeholders": [
                 {
-                    "id": "Text",
+                    "id": "TextLength",
                     "string": "%[1]d",
                     "type": "int",
                     "underlyingType": "int",
                     "argNum": 1,
-                    "expr": "len(item.Text)"
+                    "expr": "textLength"
                 },
                 {
                     "id": "MaxItemLength",
@@ -25,9 +25,9 @@
             ]
         },
         {
-            "id": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
-            "message": "Maximum number of items is {MaxItemsCount}, you have {Lenitems}.",
-            "translation": "Maksymalna liczba elementów to {MaxItemsCount}, masz {Lenitems}.",
+            "id": "Max items: {MaxItemsCount}. You added {Lenitems}.",
+            "message": "Max items: {MaxItemsCount}. You added {Lenitems}.",
+            "translation": "Maksimum przedmiotów: {MaxItemsCount}. Dodano: {Lenitems}.",
             "placeholders": [
                 {
                     "id": "MaxItemsCount",
@@ -73,14 +73,14 @@
             "translation": "Białoruski"
         },
         {
-            "id": "Copy to clipboard",
-            "message": "Copy to clipboard",
-            "translation": "Kopiuj do schowka"
+            "id": "Copy link to share",
+            "message": "Copy link to share",
+            "translation": "Skopiuj link do udostępnienia"
         },
         {
-            "id": "Enter wishlist item",
-            "message": "Enter wishlist item",
-            "translation": "Wprowadź tekst"
+            "id": "Add a wish",
+            "message": "Add a wish",
+            "translation": "Dodaj życzenie"
         },
         {
             "id": "Save",
@@ -98,24 +98,24 @@
             "translation": "Lista życzeń nie znaleziona"
         },
         {
-            "id": "Create new wishlist",
-            "message": "Create new wishlist",
+            "id": "Create a new wishlist",
+            "message": "Create a new wishlist",
             "translation": "Utwórz nową listę życzeń"
         },
         {
-            "id": "Item was already checked",
-            "message": "Item was already checked",
-            "translation": "Element został już sprawdzony"
+            "id": "This item is already reserved",
+            "message": "This item is already reserved",
+            "translation": "Ten prezent jest już zarezerwowany"
         },
         {
-            "id": "This item was already checked by another user",
-            "message": "This item was already checked by another user",
-            "translation": "Ten element został już sprawdzony przez innego użytkownika"
+            "id": "This item is already taken by another user",
+            "message": "This item is already taken by another user",
+            "translation": "Ten prezent jest już wzięty przez innego użytkownika"
         },
         {
-            "id": "Okay",
-            "message": "Okay",
-            "translation": "OK"
+            "id": "Got it",
+            "message": "Got it",
+            "translation": "Rozumiem"
         }
     ]
 }

@@ -185,3 +185,8 @@ header {
   position: relative;
   z-index: 100;
 }
+
+
+.input-container > input::placeholder {
+  overflow: visible;
+}

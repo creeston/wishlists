@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"creeston/lists/internal/handlers"
 	"creeston/lists/internal/repository"
@@ -90,13 +91,13 @@ func LanguageHandler(next echo.HandlerFunc) echo.HandlerFunc {
 func main() {
 	godotenv.Load()
 	e := echo.New()
-	repository := repository.NewInMemoryRepository()
 	baseUrl := os.Getenv("BASE_URL")
 	port := os.Getenv("PORT")
 	maxItemsCountValue := os.Getenv("MAX_ITEMS_COUNT")
 	maxItemLengthValue := os.Getenv("MAX_ITEM_LENGTH")
 	maxBodySizeValue := os.Getenv("MAX_BODY_SIZE")
 	maxRateLimitValue := os.Getenv("MAX_RATE_LIMIT")
+	useInMemoryDb := os.Getenv("USE_IN_MEMORY_DB")
 
 	maxItemsCount, err := strconv.Atoi(maxItemsCountValue)
 	if err != nil {
@@ -124,7 +125,15 @@ func main() {
 	e.Use(UserIdCookieHandler)
 	e.Use(LanguageHandler)
 	e.Renderer = NewTemplate()
-	handlers.SetupRoutes(e, repository, baseUrl, validationConfig)
+
+	var dataRepository repository.WishlistRepository
+	if strings.ToLower(useInMemoryDb) == "true" {
+		dataRepository = repository.NewInMemorySqliteRepository()
+	} else {
+		dbPath := os.Getenv("SQLITE_DB_NAME")
+		dataRepository = repository.NewSqliteRepository(dbPath)
+	}
+	handlers.SetupRoutes(e, dataRepository, baseUrl, validationConfig)
 	e.Static("/css", "css")
 	e.Logger.Fatal(e.Start(":" + port))
 }

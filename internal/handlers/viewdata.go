@@ -139,7 +139,7 @@ func MapWishlistToWishlistFormData(wishlist *domain.Wishlist) WishlistFormViewPa
 			Id:             item.Id,
 			HasId:          item.HasId,
 			Text:           item.Text,
-			AlreadyChecked: item.Checked,
+			AlreadyChecked: item.IsTaken(),
 		})
 	}
 
@@ -163,8 +163,8 @@ func MapWishlistToWishlistViewFormData(wishlist *domain.Wishlist, userId string)
 			Index:                item.Id,
 			Text:                 item.Text,
 			Id:                   wishlist.Id,
-			Checked:              item.Checked,
-			CheckedByAnotherUser: item.CheckedById != "" && item.CheckedById != userId,
+			Checked:              item.IsTaken(),
+			CheckedByAnotherUser: item.IsTaken() && item.TakenById != userId,
 		})
 	}
 
@@ -192,8 +192,8 @@ func ParseWishlistFormDataToNewWishlistItems(data map[string][]string) []string 
 	return items
 }
 
-func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []domain.UpdateWishlistItem {
-	items := []domain.UpdateWishlistItem{}
+func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []domain.UpdateWishlistItemCommand {
+	items := []domain.UpdateWishlistItemCommand{}
 
 	for key, value := range data {
 		if key == "item" {
@@ -205,7 +205,7 @@ func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []dom
 				values = append(values, v)
 			}
 			for _, v := range values {
-				items = append(items, domain.UpdateWishlistItem{
+				items = append(items, domain.UpdateWishlistItemCommand{
 					Text:  v,
 					HasId: false,
 				})
@@ -217,9 +217,7 @@ func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []dom
 				continue
 			}
 			value := value[0]
-			println(id)
-			println(value)
-			items = append(items, domain.UpdateWishlistItem{
+			items = append(items, domain.UpdateWishlistItemCommand{
 				Id:    id,
 				Text:  value,
 				HasId: true,
@@ -227,7 +225,6 @@ func ParseWishlistFormDataToUpdatedWishlistItems(data map[string][]string) []dom
 		} else {
 			continue
 		}
-
 	}
 
 	return items

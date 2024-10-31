@@ -62,11 +62,10 @@ func (r *InMemoryRepository) GetWishlistByID(id int) *domain.Wishlist {
 	items := make([]*domain.WishlistItem, 0)
 	for _, item := range wishlist.Items {
 		items = append(items, &domain.WishlistItem{
-			Text:        item.Text,
-			Id:          item.Id,
-			HasId:       item.HasId,
-			Checked:     item.Checked,
-			CheckedById: item.CheckedById,
+			Text:      item.Text,
+			Id:        item.Id,
+			HasId:     item.HasId,
+			TakenById: item.TakenById,
 		})
 	}
 	return &domain.Wishlist{
@@ -113,13 +112,11 @@ func (r *InMemoryRepository) UpdateWishlistItem(id int, item *domain.WishlistIte
 	}
 
 	wishlistItem := wishlist.GetItemByIndex(item.Id)
-	wishlistItem.Checked = item.Checked
-	wishlistItem.CheckedById = item.CheckedById
+	wishlistItem.TakenById = item.TakenById
 
 	return &domain.WishlistItem{
-		Text:        wishlistItem.Text,
-		Id:          wishlistItem.Id,
-		Checked:     wishlistItem.Checked,
-		CheckedById: wishlistItem.CheckedById,
+		Text:      wishlistItem.Text,
+		Id:        wishlistItem.Id,
+		TakenById: wishlistItem.TakenById,
 	}
 }

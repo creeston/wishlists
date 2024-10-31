@@ -1,27 +1,27 @@
 package domain
 
-type UpdateWishlistItem struct {
-	Id    int
-	Text  string
-	HasId bool
-}
+import "time"
 
 type WishlistItem struct {
-	Text        string
-	Checked     bool
-	CheckedById string
-	Id          int
-	HasId       bool
+	Id        int
+	HasId     bool
+	Text      string
+	TakenById string
+	TakenAt   time.Time
+}
+
+func (item WishlistItem) IsTaken() bool {
+	return item.TakenById != ""
 }
 
 type Wishlist struct {
-	Items     []*WishlistItem
 	Id        int
-	CreatorId string
 	Key       string
+	Items     []*WishlistItem
+	CreatorId string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
-
-type Wishlists = []*Wishlist
 
 func NewWishlist(userId string, wishlistKey string, items []string) *Wishlist {
 	wishlistItems := make([]*WishlistItem, 0)
@@ -49,10 +49,10 @@ func (wishlist *Wishlist) GetItemByIndex(index int) *WishlistItem {
 	return nil
 }
 
-func (wishlist *Wishlist) UpdateWishlistItems(items []UpdateWishlistItem) *Wishlist {
+func (wishlist *Wishlist) UpdateWishlistItems(items []UpdateWishlistItemCommand) *Wishlist {
 	newItems := make([]*WishlistItem, 0)
 	for _, item := range wishlist.Items {
-		if item.Checked {
+		if item.IsTaken() {
 			// If item was already checked by some user, then it becomes immutable
 			newItems = append(newItems, item)
 			continue
@@ -81,4 +81,10 @@ func (wishlist *Wishlist) UpdateWishlistItems(items []UpdateWishlistItem) *Wishl
 
 	wishlist.Items = newItems
 	return wishlist
+}
+
+type UpdateWishlistItemCommand struct {
+	Id    int
+	Text  string
+	HasId bool
 }

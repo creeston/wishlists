@@ -204,11 +204,11 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			Id:    wishlist.Id,
 		}
 
-		if checkRequest && wishlistItem.Checked && wishlistItem.CheckedById == userId {
+		if checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById == userId {
 			return c.Render(200, "wishlist-checked-item", viewParams)
 		}
 
-		if checkRequest && wishlistItem.Checked && wishlistItem.CheckedById != userId {
+		if checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById != userId {
 			viewData := WishlistAlredyCheckedItemParams{
 				Index:  wishlistItem.Id,
 				Text:   wishlistItem.Text,
@@ -217,23 +217,21 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return c.Render(200, "wishlist-already-checked-item-with-popup", viewData)
 		}
 
-		if !checkRequest && !wishlistItem.Checked {
+		if !checkRequest && !wishlistItem.IsTaken() {
 			return c.Render(200, "wishlist-not-checked-item", viewParams)
 		}
 
-		if !checkRequest && wishlistItem.Checked && wishlistItem.CheckedById != userId {
+		if !checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById != userId {
 			return c.Render(200, "wishlist-already-checked-item", viewParams)
 		}
 
-		if !checkRequest && wishlistItem.Checked && wishlistItem.CheckedById == userId {
-			wishlistItem.Checked = false
-			wishlistItem.CheckedById = ""
+		if !checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById == userId {
+			wishlistItem.TakenById = ""
 			repo.UpdateWishlistItem(id, wishlistItem)
 			return c.Render(200, "wishlist-not-checked-item", viewParams)
 		}
 
-		wishlistItem.Checked = true
-		wishlistItem.CheckedById = userId
+		wishlistItem.TakenById = userId
 		repo.UpdateWishlistItem(id, wishlistItem)
 		return c.Render(200, "wishlist-checked-item", viewParams)
 	})

@@ -134,6 +134,7 @@ func main() {
 		dataRepository = repository.NewSqliteRepository(dbPath)
 	}
 	handlers.SetupRoutes(e, dataRepository, baseUrl, validationConfig)
-	e.Static("/css", "css")
+	e.Static("/css", "static/css")
+	e.Static("/icons", "static/icons")
 	e.Logger.Fatal(e.Start(":" + port))
 }

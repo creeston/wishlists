@@ -126,6 +126,16 @@
             "id": "You have reached the limit for creating wishlists. Please wait a moment.",
             "message": "You have reached the limit for creating wishlists. Please wait a moment.",
             "translation": "Вы достигли лимита создания списков пожеланий. Пожалуйста, подождите немного."
+        },
+        {
+            "id": "Your request is too large!",
+            "message": "Your request is too large!",
+            "translation": "Ваш запрос слишком большой!"
+        },
+        {
+            "id": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
+            "message": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
+            "translation": "Вы достигли лимита по количеству или размеру элементов в списке. Пожалуйста, удалите некоторые элементы."
         }
     ]
 }

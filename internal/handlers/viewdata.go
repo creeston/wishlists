@@ -71,6 +71,8 @@ func getLabelsData(i18n *message.Printer, selectedLanguage string) LabelsData {
 		ItemWasAlreadyCheckedOkayButton: i18n.Sprintf("Got it"),
 		TooManyRequestsTitle:            i18n.Sprintf("You are making too many requests!"),
 		TooManyRequestsText:             i18n.Sprintf("You have reached the limit for creating wishlists. Please wait a moment."),
+		TooLargeRequestTitle:            i18n.Sprintf("Your request is too large!"),
+		TooLargeRequestText:             i18n.Sprintf("You have reached the limit for the number or size of items in the wishlist. Please remove some items."),
 	}
 }
 
@@ -89,6 +91,8 @@ type LabelsData struct {
 	ItemWasAlreadyCheckedOkayButton string
 	TooManyRequestsTitle            string
 	TooManyRequestsText             string
+	TooLargeRequestTitle            string
+	TooLargeRequestText             string
 }
 
 type WishlistFormViewParams struct {

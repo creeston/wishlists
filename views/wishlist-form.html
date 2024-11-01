@@ -7,6 +7,7 @@
   {{ else }}
   hx-post="/wishlist"
   {{ end }}
+  x-init="initializeFormValues()"
   @wishlist-created="onWishlistCreated($event)"
   @htmx:after-request="handleResponseStatus()"
   hx-swap="outerHTML"
@@ -17,7 +18,7 @@
       {{ . }}
     </small>
   {{ end }}
-  <div class="list-inputs" x-init="initializeFormValues()">
+  <div class="list-inputs">
     <template x-for="(item, index) in wishlistItems" :key="index" x-effect="wishlistItems && $nextTick(() => initializeSpanWidths())">
       <div class="input-row">
         <div class="input-container">
@@ -52,6 +53,17 @@
       </footer>
     </article>
   </dialog>
+  <dialog :open="tooLargeRequestDialogOpened">
+    <article>
+      <h2>{{ .Labels.TooLargeRequestTitle }}</h2>
+      <p> {{ .Labels.TooLargeRequestText }}</p>
+      <footer>
+        <button class="secondary" x-on:click.prevent="tooLargeRequestDialogOpened = false">
+          {{ .Labels.ItemWasAlreadyCheckedOkayButton }}
+        </button>
+      </footer>
+    </article>
+  </dialog>
   <script>
     function wishlistFormData() {
       return {
@@ -64,6 +76,7 @@
         fieldValidationErrors: {{ .ValidationErrors.FieldErrors }},
         formValidationErrors: {{ .ValidationErrors.Errors }},
         tooManyRequestsDialogOpened: false,
+        tooLargeRequestDialogOpened: false,
         initializeFormValues() {
         {{ if .HasItems }}
           this.isSaveEnabled = true;
@@ -183,6 +196,8 @@
         handleResponseStatus() {
           if (event.detail.xhr.status === 429) {
             this.tooManyRequestsDialogOpened = true;
+          } else if (event.detail.xhr.status === 413) {
+            this.tooLargeRequestDialogOpened = true;
           }
         }
       };

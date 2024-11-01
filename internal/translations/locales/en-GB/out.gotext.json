@@ -162,6 +162,20 @@
             "translation": "You have reached the limit for creating wishlists. Please wait a moment.",
             "translatorComment": "Copied from source.",
             "fuzzy": true
+        },
+        {
+            "id": "Your request is too large!",
+            "message": "Your request is too large!",
+            "translation": "Your request is too large!",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
+            "message": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
+            "translation": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
         }
     ]
 }

@@ -1,0 +1,17 @@
+{{ block "footer" . }}
+<footer>
+  <small>{{ .Labels.FooterContent }}</small>
+</footer>
+<style>
+    body > footer {
+        text-align: left;
+        padding: 5px 10px;
+        font-size: 0.8em;
+        color: var(--pico-color);
+    }
+
+    footer > small > a {
+        text-decoration: none;
+    }
+</style>
+{{ end }}

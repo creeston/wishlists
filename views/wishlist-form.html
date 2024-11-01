@@ -32,7 +32,7 @@
             x-on:keydown.backspace="removeIfAlreadyEmpty(index)" 
             :name="item.HasId === false ? 'item' : 'item-' + item.Id" 
             type="text"
-            placeholder="{{ .Labels.WishlistItemPlaceholder }}"
+            :placeholder="index === wishlistItems.length - 1 ? '{{ .Labels.WishlistItemPlaceholder }}' : ''"
             :aria-invalid="fieldValidationErrors && fieldValidationErrors[item.Text] ? 'true' : ''"
             :aria-describedby="'invalid-helper' + index" />
           <small :id="'invalid-helper' + index" x-show="fieldValidationErrors"
@@ -142,6 +142,7 @@
           }
     
           this.wishlistItems.splice(index, 1);
+          this.inputLengths.splice(index, 1);
         },
         onInput(event, index) {
           this.isSaveEnabled = this.validateForm();
@@ -149,8 +150,8 @@
           this.resizeInput(input, index);
 
           if (this.wishlistItems[index].Text.trim() === "" && this.wishlistItems.length > 1) {
-            this.wishlistItems.splice(index, 1);
-            this.inputLengths.splice(index, 1);
+            // this.wishlistItems.splice(index, 1);
+            // this.inputLengths.splice(index, 1);
           } else if (this.wishlistItems.length === index + 1) {
             this.addInput();
           }

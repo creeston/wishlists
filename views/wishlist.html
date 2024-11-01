@@ -3,28 +3,30 @@
 {{ template "heading" .}}
 <body x-data="{...themeData(), ...wishlistData()}" :data-theme="getTheme()">
   {{ template "top-bar" .}}
-
-  <div class="main-container">
-    <div class="gift-cap">
-      <div class="gift-tape-2"></div>
-      <div class="gift-tape-1"></div>
-      <div class="gift-cap-base"></div>
-      <div class="gift-cap-tape"></div>
-    </div>
-    <div class="list-container" x-init="initializeSpanWidths()">
-      {{ range .Items }} 
-        {{ if .Checked }}
-          {{ if .CheckedByAnotherUser }} 
-            {{ template "wishlist-already-checked-item" . }} 
+  <main>
+    <div class="main-container">
+      <div class="gift-cap">
+        <div class="gift-tape-2"></div>
+        <div class="gift-tape-1"></div>
+        <div class="gift-cap-base"></div>
+        <div class="gift-cap-tape"></div>
+      </div>
+      <div class="list-container" x-init="initializeSpanWidths()">
+        {{ range .Items }} 
+          {{ if .Checked }}
+            {{ if .CheckedByAnotherUser }} 
+              {{ template "wishlist-already-checked-item" . }} 
+            {{ else }} 
+              {{ template "wishlist-checked-item" . }} 
+            {{ end }} 
           {{ else }} 
-            {{ template "wishlist-checked-item" . }} 
+            {{ template "wishlist-not-checked-item" . }} 
           {{ end }} 
-        {{ else }} 
-          {{ template "wishlist-not-checked-item" . }} 
-        {{ end }} 
-      {{ end }}
+        {{ end }}
+      </div>
     </div>
-  </div>
+  </main>
+  {{ template "footer" .}}
 </body>
 
 <script>

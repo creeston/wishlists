@@ -136,6 +136,50 @@
             "id": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
             "message": "You have reached the limit for the number or size of items in the wishlist. Please remove some items.",
             "translation": "Osiągnięto limit liczby lub rozmiaru przedmiotów na liście. Proszę usunąć kilka przedmiotów."
+        },
+        {
+            "id": "This website uses cookies to save your session, allowing you to edit your wishlist and mark items to reserve in this browser.",
+            "message": "This website uses cookies to save your session, allowing you to edit your wishlist and mark items to reserve in this browser.",
+            "translation": "Ta strona używa plików cookie do zapisywania sesji, aby można było edytować swoją listę życzeń i zaznaczać zarezerwowane prezenty w tej przeglądarce."
+        },
+        {
+            "id": "Built with {Com_targetblank_classsecondary}Pico{A} • {Comcreestonlists_app_targetblank}Source code{A_1}",
+            "message": "Built with {Com_targetblank_classsecondary}Pico{A} • {Comcreestonlists_app_targetblank}Source code{A_1}",
+            "translation": "Zbudowane z {Com_targetblank_classsecondary}Pico{A} • {Comcreestonlists_app_targetblank}Kod źródłowy{A_1}",
+            "placeholders": [
+                {
+                    "id": "Com_targetblank_classsecondary",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "\"\u003ca href=\\\"https://picocss.com\\\" target=\\\"_blank\\\" class=\\\"secondary\\\"\u003e\""
+                },
+                {
+                    "id": "A",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "\"\u003c/a\u003e\""
+                },
+                {
+                    "id": "Comcreestonlists_app_targetblank",
+                    "string": "%[3]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 3,
+                    "expr": "\"\u003ca class=\\\"secondary\\\" href=\\\"https://github.com/creeston/lists-app\\\" target=\\\"_blank\\\"\u003e\""
+                },
+                {
+                    "id": "A_1",
+                    "string": "%[4]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 4,
+                    "expr": "\"\u003c/a\u003e\""
+                }
+            ]
         }
     ]
 }

@@ -3,22 +3,25 @@
 {{ template "heading" . }}
 <body x-data="{...themeData(), ...wishlistData()}" :data-theme="getTheme()">
   {{ template "top-bar-manage" .}}
-  <div class="main-container">
-    {{ if .Key }}
-    <div class="wishlist-url-container" x-show="wishlistId !== undefined">
-      {{ template "wishlist-share-url" .}}
+  <main>
+    <div class="main-container">
+      {{ if .Key }}
+      <div class="wishlist-url-container" x-show="wishlistId !== undefined">
+        {{ template "wishlist-share-url" .}}
+      </div>
+      {{ end }}
+      <div class="gift-cap" :class="{'gift-cap-opened': isCreating}">
+        <div class="gift-tape-2"></div>
+        <div class="gift-tape-1"></div>
+        <div class="gift-cap-base"></div>
+        <div class="gift-cap-tape"></div>
+      </div>
+      <div class="list-container">
+        {{ template "wishlist-form" .}}
+      </div>
     </div>
-    {{ end }}
-    <div class="gift-cap" :class="{'gift-cap-opened': isCreating}">
-      <div class="gift-tape-2"></div>
-      <div class="gift-tape-1"></div>
-      <div class="gift-cap-base"></div>
-      <div class="gift-cap-tape"></div>
-    </div>
-    <div class="list-container">
-      {{ template "wishlist-form" .}}
-    </div>
-  </div>
+  </main>
+  {{ template "footer" .}}
   <script>
     const capDiv = document.getElementsByClassName("gift-cap")[0];
     const listContainer = document.getElementsByClassName("list-container")[0];
@@ -98,3 +101,4 @@
   }
 </style>
 {{ end }}
+

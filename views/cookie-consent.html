@@ -1,0 +1,62 @@
+{{ block "cookie-consent" .}}
+<div id="cookie-consent-banner" style="display: none;">
+    <p>{{ .Labels.CookieConsentText }}</p>
+    <button class="contrast" onclick="acceptCookies()">Понятно</button>
+</div>
+
+<style>
+    #cookie-consent-banner {
+        position: fixed;
+        bottom: -100px; 
+        left: 0; 
+        width: 100%;
+        background-color: var(--pico-background-color);
+        text-align: center;
+        padding: 10px 40px;
+        font-size: 0.9em;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        transition: bottom 0.5s ease;
+        border-top: 1px solid var(--pico-muted-border-color);
+    }
+
+    #cookie-consent-banner.show {
+        bottom: 0;
+    }
+
+    #cookie-consent-banner p {
+        margin: 0;
+    }
+
+    #cookie-consent-banner button {
+        padding: 5px 10px;
+    }
+</style>
+<script>
+    const cookieConsentKey = "cookieConsent";
+    const cookieConsentBannerId = "cookie-consent-banner";
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!localStorage.getItem(cookieConsentKey)) {
+            const banner = document.getElementById(cookieConsentBannerId);
+            banner.style.display = "flex";
+            setTimeout(() => {
+                banner.classList.add("show");
+            }, 100)
+        }
+    });
+
+    function acceptCookies() {
+        localStorage.setItem(cookieConsentKey, "true");
+        const banner = document.getElementById(cookieConsentBannerId);
+        banner.classList.remove("show");
+        setTimeout(() => {
+            banner.style.display = "none";
+        }, 500);
+    }
+</script>
+
+
+{{ end }}

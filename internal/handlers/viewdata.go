@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"creeston/lists/internal/domain"
+	"html/template"
 	"sort"
 	"strconv"
 
@@ -73,6 +74,13 @@ func getLabelsData(i18n *message.Printer, selectedLanguage string) LabelsData {
 		TooManyRequestsText:             i18n.Sprintf("You have reached the limit for creating wishlists. Please wait a moment."),
 		TooLargeRequestTitle:            i18n.Sprintf("Your request is too large!"),
 		TooLargeRequestText:             i18n.Sprintf("You have reached the limit for the number or size of items in the wishlist. Please remove some items."),
+		CookieConsentText:               i18n.Sprintf("This website uses cookies to save your session, allowing you to edit your wishlist and mark items to reserve in this browser."),
+		FooterContent: template.HTML(i18n.Sprintf(
+			"Built with %sPico%s • %sSource code%s",
+			"<a href=\"https://picocss.com\" target=\"_blank\" class=\"secondary\">",
+			"</a>",
+			"<a class=\"secondary\" href=\"https://github.com/creeston/lists-app\" target=\"_blank\">",
+			"</a>")),
 	}
 }
 
@@ -93,6 +101,8 @@ type LabelsData struct {
 	TooManyRequestsText             string
 	TooLargeRequestTitle            string
 	TooLargeRequestText             string
+	CookieConsentText               string
+	FooterContent                   template.HTML
 }
 
 type WishlistFormViewParams struct {

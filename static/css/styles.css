@@ -1,6 +1,12 @@
 body {
   background-color: var(--pico-background-color);
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
 }
 
 .main-container {
@@ -190,3 +196,7 @@ header {
 .input-container > input::placeholder {
   overflow: visible;
 }
+
+.theme-button {
+  line-height: 24px;
+} 

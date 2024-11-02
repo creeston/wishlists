@@ -23,13 +23,14 @@
       <div class="input-row">
         <div class="input-container">
           <input 
-            :disabled="!isCreating || item.AlreadyChecked" 
+            :disabled="!isCreating"
+            :readonly="item.AlreadyChecked" 
             :id="'input-' + index"
             :class="{'crossed-text':  item.AlreadyChecked}" 
             x-model="item.Text" 
             x-on:input="onInput($event, index)"
             x-on:keydown.enter.prevent="focusOnNextInputElement(index)"
-            x-on:keydown.backspace="removeIfAlreadyEmpty(index)" 
+            x-on:keydown.backspace="removeIfAlreadyEmpty($event, index)" 
             :name="item.HasId === false ? 'item' : 'item-' + item.Id" 
             type="text"
             :placeholder="index === wishlistItems.length - 1 ? '{{ .Labels.WishlistItemPlaceholder }}' : ''"
@@ -127,22 +128,25 @@
             previousInput.focus();
           }
         },
-        removeIfAlreadyEmpty(index) {
+        removeIfAlreadyEmpty(event, index) {
           if (this.wishlistItems[index].Text.trim() !== "") {
             return;
           }
     
           if (index === this.wishlistItems.length - 1) {
             this.focusOnPreviousInputElement(index);
+            event.preventDefault();
             return;
           }
 
           if (this.fieldValidationErrors[index + ""]) {
             delete this.fieldValidationErrors[index + ""];
+            event.preventDefault();
           }
     
           this.wishlistItems.splice(index, 1);
           this.inputLengths.splice(index, 1);
+          event.preventDefault();
         },
         onInput(event, index) {
           this.isSaveEnabled = this.validateForm();

@@ -41,7 +41,7 @@ func NewInMemorySqliteRepository() *SqliteRepository {
 }
 
 func (r *SqliteRepository) Init() {
-	_, err := r.db.Exec("CREATE TABLE IF NOT EXISTS wishlists (id INTEGER PRIMARY KEY, creator_id TEXT, key TEXT, created_at TEXT, updated_at TEXT)")
+	_, err := r.db.Exec("CREATE TABLE IF NOT EXISTS wishlists (id INTEGER PRIMARY KEY, creator_id TEXT, creator_ip TEXT, key TEXT, created_at TEXT, updated_at TEXT)")
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +52,7 @@ func (r *SqliteRepository) Init() {
 	}
 }
 
-func (r *SqliteRepository) AddWishlist(wishlist *domain.Wishlist) *domain.Wishlist {
+func (r *SqliteRepository) AddWishlist(wishlist *domain.Wishlist, creatorIp string) *domain.Wishlist {
 	tx, err := r.db.Begin()
 	if err != nil {
 		panic(err)
@@ -62,8 +62,9 @@ func (r *SqliteRepository) AddWishlist(wishlist *domain.Wishlist) *domain.Wishli
 	wishlist.CreatedAt = currentTime
 	wishlist.UpdatedAt = currentTime
 	result, err := tx.Exec(
-		"INSERT INTO wishlists (creator_id, key, created_at, updated_at) VALUES (?, ?, ?, ?)",
+		"INSERT INTO wishlists (creator_id, creator_ip, key, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
 		wishlist.CreatorId,
+		creatorIp,
 		wishlist.Key,
 		wishlist.CreatedAt.Format(time.RFC3339),
 		wishlist.UpdatedAt.Format(time.RFC3339),
@@ -98,7 +99,7 @@ func (r *SqliteRepository) AddWishlist(wishlist *domain.Wishlist) *domain.Wishli
 	return wishlist
 }
 
-func (r *SqliteRepository) GetWishlistByID(id int) *domain.Wishlist {
+func (r *SqliteRepository) GetWishlistById(id int) *domain.Wishlist {
 	wishlist := &domain.Wishlist{}
 	createdAt := ""
 	updatedAt := ""
@@ -149,8 +150,26 @@ func (r *SqliteRepository) GetWishlistByID(id int) *domain.Wishlist {
 	return wishlist
 }
 
+func (r *SqliteRepository) GetRecentWishlistsCreatedByUserCount(userId string, ipAddress string, period time.Duration) int {
+	query := "SELECT COUNT(*) FROM wishlists WHERE (creator_id = ? OR creator_ip = ?) AND created_at > ?"
+	rows, err := r.db.Query(query, userId, ipAddress, time.Now().Add(-period).Format(time.RFC3339))
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	count := 0
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return count
+}
+
 func (r *SqliteRepository) UpdateWishlist(id int, wishlist *domain.Wishlist) *domain.Wishlist {
-	existingWishlist := r.GetWishlistByID(id)
+	existingWishlist := r.GetWishlistById(id)
 	if existingWishlist == nil {
 		return nil
 	}
@@ -195,10 +214,10 @@ func (r *SqliteRepository) UpdateWishlist(id int, wishlist *domain.Wishlist) *do
 		panic(err)
 	}
 
-	return r.GetWishlistByID(id)
+	return r.GetWishlistById(id)
 }
 
-func (r *SqliteRepository) UpdateWishlistItem(id int, item *domain.WishlistItem) *domain.WishlistItem {
+func (r *SqliteRepository) UpdateWishlistItem(id int, item domain.WishlistItem) domain.WishlistItem {
 	takenAtValue := ""
 	if item.IsTaken() {
 		item.TakenAt = time.Now()

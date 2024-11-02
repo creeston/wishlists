@@ -1,6 +1,14 @@
 package domain
 
-import "time"
+import (
+	"creeston/lists/internal/utils"
+	"errors"
+	"time"
+)
+
+var ErrAlreadyTakenItemByAnotherUser = errors.New("domain: wishlist item is already taken by another user")
+var ErrAlreadyTakenItem = errors.New("domain: wishlist item is already taken by this user")
+var ErrAlreadyUntakenItem = errors.New("domain: wishlist item is already untaken")
 
 type WishlistItem struct {
 	Id        int
@@ -14,6 +22,37 @@ func (item WishlistItem) IsTaken() bool {
 	return item.TakenById != ""
 }
 
+func (item WishlistItem) IsTakenBy(userId string) bool {
+	return item.TakenById == userId
+}
+
+func (item *WishlistItem) Take(userId string) error {
+	if item.IsTaken() {
+		if item.IsTakenBy(userId) {
+			return ErrAlreadyTakenItem
+		} else {
+			return ErrAlreadyTakenItemByAnotherUser
+		}
+	}
+
+	item.TakenById = userId
+	item.TakenAt = time.Now()
+	return nil
+}
+
+func (item *WishlistItem) Untake(userId string) error {
+	if !item.IsTaken() {
+		return ErrAlreadyUntakenItem
+	}
+
+	if !item.IsTakenBy(userId) {
+		return ErrAlreadyTakenItemByAnotherUser
+	}
+
+	item.TakenById = ""
+	return nil
+}
+
 type Wishlist struct {
 	Id        int
 	Key       string
@@ -23,7 +62,7 @@ type Wishlist struct {
 	UpdatedAt time.Time
 }
 
-func NewWishlist(userId string, wishlistKey string, items []string) *Wishlist {
+func NewWishlist(items []string) *Wishlist {
 	wishlistItems := make([]*WishlistItem, 0)
 	for _, item := range items {
 		wishlistItems = append(wishlistItems, &WishlistItem{
@@ -33,10 +72,22 @@ func NewWishlist(userId string, wishlistKey string, items []string) *Wishlist {
 	}
 
 	return &Wishlist{
-		Items:     wishlistItems,
-		CreatorId: userId,
-		Key:       wishlistKey,
+		Items: wishlistItems,
+		Key:   utils.GenerateUUID(),
 	}
+}
+
+func (wishlist *Wishlist) CreatedBy(userId string) *Wishlist {
+	wishlist.CreatorId = userId
+	return wishlist
+}
+
+func (wishlist *Wishlist) IsAllowedToEdit(userId string) bool {
+	return wishlist.CreatorId == userId
+}
+
+func (wishlist *Wishlist) IsAllowedToView(key string) bool {
+	return wishlist.Key == key
 }
 
 func (wishlist *Wishlist) GetItemByIndex(index int) *WishlistItem {
@@ -49,7 +100,7 @@ func (wishlist *Wishlist) GetItemByIndex(index int) *WishlistItem {
 	return nil
 }
 
-func (wishlist *Wishlist) UpdateWishlistItems(items []UpdateWishlistItemCommand) *Wishlist {
+func (wishlist *Wishlist) UpdateItems(items []UpdateWishlistItemCommand) *Wishlist {
 	newItems := make([]*WishlistItem, 0)
 	for _, item := range wishlist.Items {
 		if item.IsTaken() {

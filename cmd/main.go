@@ -71,12 +71,6 @@ func getLanguageFromRequest(c echo.Context) language.Tag {
 	acceptLang = acceptLang[:5]
 	lang := message.MatchLanguage(acceptLang)
 	return lang
-	// lang, err := language.Parse(acceptLang)
-	// if err == nil {
-	// 	return lang
-	// }
-
-	// return language.English
 }
 
 func LanguageHandler(next echo.HandlerFunc) echo.HandlerFunc {
@@ -96,6 +90,7 @@ func main() {
 	port := os.Getenv("PORT")
 	maxItemsCountValue := os.Getenv("MAX_ITEMS_COUNT")
 	maxItemLengthValue := os.Getenv("MAX_ITEM_LENGTH")
+	MaxWishlistsPerDayValue := os.Getenv("MAX_WISHLISTS_PER_DAY")
 	maxBodySizeValue := os.Getenv("MAX_BODY_SIZE")
 	useInMemoryDb := os.Getenv("USE_IN_MEMORY_DB")
 
@@ -109,13 +104,18 @@ func main() {
 		panic(err)
 	}
 
+	maxWishlistsPerDay, err := strconv.Atoi(MaxWishlistsPerDayValue)
+	if err != nil {
+		panic(err)
+	}
+
 	validationConfig := handlers.ValidationConfig{
-		MaxItemsCount: maxItemsCount,
-		MaxItemLength: maxItemLength,
+		MaxItemsCount:      maxItemsCount,
+		MaxItemLength:      maxItemLength,
+		MaxWishlistsPerDay: maxWishlistsPerDay,
 	}
 
 	e.Use(middleware.BodyLimit(maxBodySizeValue))
-	e.Use(CreateWishlistCreateRateLimiter())
 	e.Use(CreateGlobalRateLimiter())
 	e.Use(middleware.Logger())
 	e.Use(UserIdCookieHandler)
@@ -139,33 +139,4 @@ func CreateGlobalRateLimiter() echo.MiddlewareFunc {
 	return middleware.RateLimiter(middleware.NewRateLimiterMemoryStoreWithConfig(
 		middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(5), Burst: 5, ExpiresIn: 3 * time.Minute},
 	))
-}
-
-func CreateWishlistCreateRateLimiter() echo.MiddlewareFunc {
-	wishlistCreateRateLimiterConfig := middleware.RateLimiterConfig{
-		Skipper: WishlistCreateEndpointSkipper,
-		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
-			middleware.RateLimiterMemoryStoreConfig{Rate: rate.Every(time.Hour), Burst: 2, ExpiresIn: 3 * time.Hour},
-		),
-		IdentifierExtractor: func(ctx echo.Context) (string, error) {
-			id := ctx.RealIP()
-			return id, nil
-		},
-		ErrorHandler: func(context echo.Context, err error) error {
-			return context.JSON(http.StatusForbidden, nil)
-		},
-		DenyHandler: func(context echo.Context, identifier string, err error) error {
-			return context.JSON(http.StatusTooManyRequests, nil)
-		},
-	}
-
-	return middleware.RateLimiterWithConfig(wishlistCreateRateLimiterConfig)
-}
-
-func WishlistCreateEndpointSkipper(c echo.Context) bool {
-	if c.Request().Method == http.MethodPost && c.Path() == "/wishlist" {
-		return false
-	}
-
-	return true
 }

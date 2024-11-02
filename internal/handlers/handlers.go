@@ -3,10 +3,11 @@ package handlers
 import (
 	"creeston/lists/internal/domain"
 	"creeston/lists/internal/repository"
-	"creeston/lists/internal/utils"
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/labstack/echo/v4"
@@ -58,7 +59,7 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 		}
 
 		key := c.QueryParam("key")
-		wishlist := repo.GetWishlistByID(id)
+		wishlist := repo.GetWishlistById(id)
 
 		if wishlist == nil {
 			return c.Render(200, "not-found", NotFoundViewParams{
@@ -88,6 +89,15 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 	})
 
 	e.POST("/wishlist", func(c echo.Context) error {
+		ipAddress := c.RealIP()
+		userId := GetUserId(c)
+
+		period := time.Hour * 24
+		recentWishlistsCount := repo.GetRecentWishlistsCreatedByUserCount(userId, ipAddress, period)
+		if recentWishlistsCount >= validationConfig.MaxWishlistsPerDay {
+			return c.String(429, "Too many wishlists created")
+		}
+
 		params, error := c.FormParams()
 		if error != nil {
 			return error
@@ -95,10 +105,8 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		i18n := GetPrinter(c)
 		language := GetClientLanguage(c)
-		userId := GetUserId(c)
-		wishlistKey := utils.GenerateUUID()
 		items := ParseWishlistFormDataToNewWishlistItems(params)
-		wishlist := domain.NewWishlist(userId, wishlistKey, items)
+		wishlist := domain.NewWishlist(items).CreatedBy(userId)
 		validationErrors := validateWishlistItems(wishlist.Items, i18n, validationConfig)
 		if validationErrors.AnyErrors() {
 			return c.Render(200, "wishlist-form", WishlistFormViewParams{
@@ -109,7 +117,7 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			})
 		}
 
-		wishlist = repo.AddWishlist(wishlist)
+		wishlist = repo.AddWishlist(wishlist, ipAddress)
 
 		// Currently redirection implemented on the client side.
 		// If we need to immediately redirect user, we should uncomment it.
@@ -127,13 +135,13 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 
 		i18n := GetPrinter(c)
 
-		wishlist := repo.GetWishlistByID(id)
+		wishlist := repo.GetWishlistById(id)
 		if wishlist == nil {
 			return c.String(404, "Wishlist not found")
 		}
 
 		userId := GetUserId(c)
-		if userId != wishlist.CreatorId {
+		if !wishlist.IsAllowedToEdit(userId) {
 			return c.String(403, "Forbidden")
 		}
 
@@ -142,8 +150,8 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return error
 		}
 
-		items := ParseWishlistFormDataToUpdatedWishlistItems(params)
-		wishlist.UpdateWishlistItems(items)
+		updateItemCommands := ParseWishlistFormDataToUpdatedWishlistItems(params)
+		wishlist.UpdateItems(updateItemCommands)
 		validationErrors := validateWishlistItems(wishlist.Items, i18n, validationConfig)
 		if validationErrors.AnyErrors() {
 			formProps := MapWishlistToWishlistFormData(wishlist)
@@ -159,35 +167,28 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 	})
 
 	e.PUT("/wishlist/:id/:itemId", func(c echo.Context) error {
-		i18n := GetPrinter(c)
-		userId := GetUserId(c)
-
 		id, error := strconv.Atoi(c.Param("id"))
 		if error != nil {
 			return error
 		}
-
-		// take hx-current-url from headers
-		currentUrl := c.Request().Header.Get("HX-Current-URL")
-		u, err := url.Parse(currentUrl)
-		if err != nil {
-			panic(err)
-		}
-
-		m, _ := url.ParseQuery(u.RawQuery)
-		key := m.Get("key")
 
 		itemId, error := strconv.Atoi(c.Param("itemId"))
 		if error != nil {
 			return error
 		}
 
-		wishlist := repo.GetWishlistByID(id)
+		currentUrl := c.Request().Header.Get("HX-Current-URL")
+		key, error := getKeyFromUrl(currentUrl)
+		if error != nil {
+			panic(error)
+		}
+
+		wishlist := repo.GetWishlistById(id)
 		if wishlist == nil {
 			return c.String(404, "Wishlist not found")
 		}
 
-		if wishlist.Key != key {
+		if !wishlist.IsAllowedToView(key) {
 			return c.String(403, "Forbidden")
 		}
 
@@ -197,44 +198,55 @@ func SetupRoutes(e *echo.Echo, repo repository.WishlistRepository, baseUrl strin
 			return c.String(404, "Item not found")
 		}
 
-		checkRequest := c.FormValue(("flag")) == "on"
+		checkRequest := strings.ToLower(c.FormValue(("flag"))) == "on"
 		viewParams := WishlistCheckableItemParams{
 			Index: wishlistItem.Id,
 			Text:  wishlistItem.Text,
 			Id:    wishlist.Id,
 		}
 
-		if checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById == userId {
-			return c.Render(200, "wishlist-checked-item", viewParams)
-		}
+		i18n := GetPrinter(c)
+		userId := GetUserId(c)
 
-		if checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById != userId {
-			viewData := WishlistAlredyCheckedItemParams{
-				Index:  wishlistItem.Id,
-				Text:   wishlistItem.Text,
-				Labels: getLabelsData(i18n, GetClientLanguage(c)),
+		if checkRequest {
+			err := wishlistItem.Take(userId)
+			if err == domain.ErrAlreadyTakenItem {
+				return c.Render(200, "wishlist-checked-item", viewParams)
+			} else if err == domain.ErrAlreadyTakenItemByAnotherUser {
+				viewData := WishlistAlredyCheckedItemParams{
+					Index:  wishlistItem.Id,
+					Text:   wishlistItem.Text,
+					Labels: getLabelsData(i18n, GetClientLanguage(c)),
+				}
+				return c.Render(200, "wishlist-already-checked-item-with-popup", viewData)
 			}
-			return c.Render(200, "wishlist-already-checked-item-with-popup", viewData)
+		} else {
+			err := wishlistItem.Untake(userId)
+			if err == domain.ErrAlreadyUntakenItem {
+				return c.Render(200, "wishlist-not-checked-item", viewParams)
+			} else if err == domain.ErrAlreadyTakenItemByAnotherUser {
+				return c.Render(200, "wishlist-already-checked-item", viewParams)
+			}
 		}
 
-		if !checkRequest && !wishlistItem.IsTaken() {
+		repo.UpdateWishlistItem(id, *wishlistItem)
+		if wishlistItem.IsTaken() {
+			return c.Render(200, "wishlist-checked-item", viewParams)
+		} else {
 			return c.Render(200, "wishlist-not-checked-item", viewParams)
 		}
-
-		if !checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById != userId {
-			return c.Render(200, "wishlist-already-checked-item", viewParams)
-		}
-
-		if !checkRequest && wishlistItem.IsTaken() && wishlistItem.TakenById == userId {
-			wishlistItem.TakenById = ""
-			repo.UpdateWishlistItem(id, wishlistItem)
-			return c.Render(200, "wishlist-not-checked-item", viewParams)
-		}
-
-		wishlistItem.TakenById = userId
-		repo.UpdateWishlistItem(id, wishlistItem)
-		return c.Render(200, "wishlist-checked-item", viewParams)
 	})
+}
+
+func getKeyFromUrl(currentUrl string) (string, error) {
+	parsedUrl, err := url.Parse(currentUrl)
+	if err != nil {
+		return "", err
+	}
+
+	queryValues, _ := url.ParseQuery(parsedUrl.RawQuery)
+	key := queryValues.Get("key")
+	return key, nil
 }
 
 func validateWishlistItems(items []*domain.WishlistItem, i18n *message.Printer, validationConfig ValidationConfig) ValidationErrors {

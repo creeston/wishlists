@@ -10,8 +10,9 @@ import (
 )
 
 type ValidationConfig struct {
-	MaxItemsCount int
-	MaxItemLength int
+	MaxItemsCount      int
+	MaxItemLength      int
+	MaxWishlistsPerDay int
 }
 
 type LanguageData struct {

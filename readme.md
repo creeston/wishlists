@@ -1,15 +1,40 @@
+# Wishlist
+
+A simple app that was created with purpose of learning Go with HTMX and Alpine.js.
+
+## App overview 
+
+App allows users to create wishlists and share them with others. Other users can see the wishlist and mark items as "reserved". Once item is reserved, it is not possible to reserve it again by other user, or delete / modify it by the owner.
+
+### Technologies used
+
+- Go
+- HTMX
+- Alpine.js
+- SQLite
+- Pico CSS
+
+## Development
+
+### Pre-requisites
+
+- Go 1.23
+- Air
+- Docker (optional)
+- dlv (optional for debugging)
+
+### Running with Docker
+
+`docker compose up -d`
+
+### Running in terminal
+
+`air`
+
 ## Debug 
 
 dlv debug cmd/main.go 
 
-## Extract texts for translation
+### Extracting texts for translation
 
 gotext -srclang=en-GB update -out="catalog.go" -lang="en-GB,pl-PL,ru-RU,be-BY" creeston/lists/internal/handlers
-
-## To do
-
-1. Create Dockerfile
-
-### When becomes a problem
-
-1. Archive (or delete) old wishlists, which were not updated in a while

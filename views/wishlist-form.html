@@ -49,7 +49,7 @@
       <p> {{ .Labels.TooManyRequestsText }}</p>
       <footer>
         <button class="secondary" x-on:click.prevent="tooManyRequestsDialogOpened = false">
-          {{ .Labels.ItemWasAlreadyCheckedOkayButton }}
+          {{ .Labels.OkayButton }}
         </button>
       </footer>
     </article>
@@ -60,7 +60,7 @@
       <p> {{ .Labels.TooLargeRequestText }}</p>
       <footer>
         <button class="secondary" x-on:click.prevent="tooLargeRequestDialogOpened = false">
-          {{ .Labels.ItemWasAlreadyCheckedOkayButton }}
+          {{ .Labels.OkayButton }}
         </button>
       </footer>
     </article>

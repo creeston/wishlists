@@ -1,3 +1,5 @@
+[![npm](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.proudbush-84ce1133.polandcentral.azurecontainerapps.io/)
+
 # Wishlist
 
 A simple app that was created with purpose of learning Go with HTMX and Alpine.js.

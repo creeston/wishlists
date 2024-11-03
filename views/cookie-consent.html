@@ -1,7 +1,7 @@
 {{ block "cookie-consent" .}}
 <div id="cookie-consent-banner" style="display: none;">
     <p>{{ .Labels.CookieConsentText }}</p>
-    <button class="contrast" onclick="acceptCookies()">Понятно</button>
+    <button class="contrast" onclick="acceptCookies()">{{ .Labels.Ok }}</button>
 </div>
 
 <style>

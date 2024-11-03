@@ -1,14 +1,15 @@
-[![npm](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.proudbush-84ce1133.polandcentral.azurecontainerapps.io/)
-
 # Wishlist
+[![azure](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.proudbush-84ce1133.polandcentral.azurecontainerapps.io/)
 
-A simple app that was created with purpose of learning Go with HTMX and Alpine.js.
+## Overview
 
-## App overview 
+A wishlist creation app built with Go as the backend and HTMX and Alpine.js for the frontend.
 
-App allows users to create wishlists and share them with others. Other users can see the wishlist and mark items as "reserved". Once item is reserved, it is not possible to reserve it again by other user, or delete / modify it by the owner.
+ - Create and share wishlists with others.
+ - Users can view your wishlist and mark items as "reserved."
+ - Once an item is reserved, it cannot be reserved by another user, nor can it be deleted or modified by the owner.
 
-### Technologies used
+### Technologies Used
 
 - Go
 - HTMX
@@ -35,8 +36,8 @@ App allows users to create wishlists and share them with others. Other users can
 
 ## Debug 
 
-dlv debug cmd/main.go 
+`dlv debug cmd/main.go `
 
 ### Extracting texts for translation
 
-gotext -srclang=en-GB update -out="catalog.go" -lang="en-GB,pl-PL,ru-RU,be-BY" creeston/lists/internal/handlers
+`gotext -srclang=en-GB update -out="catalog.go" -lang="en-GB,pl-PL,ru-RU,be-BY" creeston/lists/internal/handlers`

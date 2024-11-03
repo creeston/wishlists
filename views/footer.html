@@ -1,6 +1,11 @@
 {{ block "footer" . }}
 <footer>
-  <small>{{ .Labels.FooterContent }}</small>
+    <div>
+        <small>{{ .Labels.FooterContent }} </small>
+    </div>
+    <div class="theme-button-container">
+        {{ template "theme-button" . }}
+    </div>
 </footer>
 <style>
     body > footer {
@@ -12,6 +17,14 @@
 
     footer > small > a {
         text-decoration: none;
+    }
+
+    footer > div {
+        display: inline-block;
+    }
+
+    .theme-button-container {
+        float: right;
     }
 </style>
 {{ end }}

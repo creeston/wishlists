@@ -198,8 +198,17 @@ header {
 }
 
 .theme-button {
-  line-height: 24px;
+  cursor: pointer;
 } 
+
+.light-theme-svg {
+  color: var(--pico-form-element-color);
+
+}
+
+.dark-theme-svg {
+  color: var(--pico-secondary-background);
+}
 
 
 input[readonly] {

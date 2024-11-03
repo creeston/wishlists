@@ -80,7 +80,7 @@ func getLabelsData(i18n *message.Printer, selectedLanguage string) LabelsData {
 			"Built with %sPico%s • %sSource code%s",
 			"<a href=\"https://picocss.com\" target=\"_blank\" class=\"secondary\">",
 			"</a>",
-			"<a class=\"secondary\" href=\"https://github.com/creeston/lists-app\" target=\"_blank\">",
+			"<a class=\"secondary\" href=\"https://github.com/creeston/wishlists\" target=\"_blank\">",
 			"</a>")),
 	}
 }

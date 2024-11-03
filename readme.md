@@ -1,9 +1,10 @@
-# Wishlist
+# Wish!
+
 [![azure](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.proudbush-84ce1133.polandcentral.azurecontainerapps.io/)
 
 ## Overview
 
-A wishlist creation app built with Go as the backend and HTMX and Alpine.js for the frontend.
+Wish! — A wishlist creation app built with Go as the backend and HTMX and Alpine.js for the frontend.
 
  - Create and share wishlists with others.
  - Users can view your wishlist and mark items as "reserved."

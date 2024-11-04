@@ -68,9 +68,13 @@ func getLanguageFromRequest(c echo.Context) language.Tag {
 	}
 
 	acceptLang := c.Request().Header.Get("Accept-Language")
-	acceptLang = acceptLang[:5]
-	lang := message.MatchLanguage(acceptLang)
-	return lang
+	if len(acceptLang) >= 2 {
+		acceptLang = acceptLang[:5]
+		lang := message.MatchLanguage(acceptLang)
+		return lang
+	} else {
+		return language.BritishEnglish
+	}
 }
 
 func LanguageHandler(next echo.HandlerFunc) echo.HandlerFunc {

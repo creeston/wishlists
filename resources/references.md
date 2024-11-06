@@ -23,3 +23,5 @@ https://xeiaso.net/blog/using-tailwind-go/
 https://www.alexedwards.net/blog/i18n-managing-translations
 
 https://echo.labstack.com/docs/middleware/rate-limiter
+
+https://www.pulumi.com/docs/iac/get-started/azure/begin/

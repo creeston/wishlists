@@ -1,6 +1,6 @@
 # Wish!
 
-[![azure](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.proudbush-84ce1133.polandcentral.azurecontainerapps.io/)
+[![azure](https://img.shields.io/badge/demo-online-008000.svg)](https://wishlist-app.azurewebsites.net/)
 
 ## Overview
 

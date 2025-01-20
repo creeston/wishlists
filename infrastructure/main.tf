@@ -54,7 +54,7 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    "BASE_URL" = "https://${var.app_service_name}.azurewebsites.net/"
+    "BASE_URL" = "https://${var.app_service_name}.azurewebsites.net"
     "PORT" = "80"
     "MAX_ITEMS_COUNT" = "10"
     "MAX_BODY_SIZE" = "10K"

@@ -10,7 +10,7 @@
         {{ template "wishlist-share-url" .}}
       </div>
       {{ end }}
-      <div class="gift-cap" :class="{'gift-cap-opened': isCreating}">
+      <div class="gift-cap" :class="{'gift-cap-opened': isCreation}">
         <div class="gift-tape-2"></div>
         <div class="gift-tape-1"></div>
         <div class="gift-cap-base"></div>
@@ -28,14 +28,16 @@
 
     function wishlistData() {
       return {
-        isCreating: true,
+        isCreation: true,
+        isWishlistRequestPending: false,
         isSaveEnabled: false,
         wishlistId: undefined,
         setFormAsCreating() {
-          this.isCreating = true;
+          this.isCreation = true;
           capDiv.classList.add("gift-cap-opened");
         },
         toggleForm() {
+          this.isWishlistRequestPending = true;
           const form = document.querySelector("form");
           form.requestSubmit();
         },

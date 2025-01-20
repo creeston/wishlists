@@ -6,9 +6,17 @@
     </ul>
     <ul class="edge-navbar-options">
       <li>
-        <button x-show="isCreating && isSaveEnabled" class="secondary save-button" x-on:click="toggleForm()">{{ .Labels.SaveButtonTitle }}</button>
+        <button 
+          class="secondary save-button" 
+          x-show="isCreation && isSaveEnabled" 
+          x-on:click="toggleForm()" 
+          :disabled="isWishlistRequestPending" 
+          :aria-busy="isWishlistRequestPending ? 'true' : ''"
+        >
+          {{ .Labels.SaveButtonTitle }}
+        </button>
         {{ if .HasId}}
-          <button x-show="!isCreating" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .Labels.EditButtonTitle }}</button>
+          <button x-show="!isCreation" class="secondary save-button" x-on:click="setFormAsCreating()">{{ .Labels.EditButtonTitle }}</button>
         {{ end }}
       </li>
       <li>

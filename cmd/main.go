@@ -68,7 +68,7 @@ func getLanguageFromRequest(c echo.Context) language.Tag {
 	}
 
 	acceptLang := c.Request().Header.Get("Accept-Language")
-	if len(acceptLang) >= 2 {
+	if len(acceptLang) >= 5 {
 		acceptLang = acceptLang[:5]
 		lang := message.MatchLanguage(acceptLang)
 		return lang
@@ -134,8 +134,8 @@ func main() {
 		dataRepository = repository.NewSqliteRepository(dbPath)
 	}
 	handlers.SetupRoutes(e, dataRepository, baseUrl, validationConfig)
-	e.Static("/css", "static/css")
-	e.Static("/icons", "static/icons")
+	e.Static("/css", "views/static/css")
+	e.Static("/icons", "views/static/icons")
 	e.Logger.Fatal(e.Start(":" + port))
 }
 

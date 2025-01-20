@@ -11,7 +11,7 @@
   @wishlist-created="onWishlistCreated($event)"
   @htmx:after-request="handleResponseStatus()"
   hx-swap="outerHTML"
-  autocomplete="off" 
+  autocomplete="off"
 >
   {{ range .ValidationErrors.Errors }}
     <small class="form-validation-error">
@@ -23,7 +23,7 @@
       <div class="input-row">
         <div class="input-container">
           <input 
-            :disabled="!isCreating"
+            :disabled="!isCreation || isWishlistRequestPending"
             :readonly="item.AlreadyChecked" 
             :id="'input-' + index"
             :class="{'crossed-text':  item.AlreadyChecked}" 
@@ -82,20 +82,20 @@
         {{ if .HasItems }}
           this.isSaveEnabled = true;
           if (this.anyValidationErrors()) {
-            this.isCreating = true;
+            this.isCreation = true;
             this.addInput();
           } else {
-            this.isCreating = false;
+            this.isCreation = false;
           }
           this.wishlistId = {{ .Id }};
         {{ else }}
           if (this.wishlistItems.length === 0 || this.wishlistItems[this.wishlistItems.length - 1].Text !== "") {
             this.addInput();
           }
-          this.isCreating = true;
+          this.isCreation = true;
           this.isSaveEnabled = this.validateForm();
          {{ end }}
-          this.$watch('isCreating', value => { 
+          this.$watch('isCreation', value => { 
             if (value) {
               if (this.wishlistItems[this.wishlistItems.length - 1].Text !== "") {
                 this.addInput();
@@ -199,6 +199,7 @@
           this.inputLengths.push(0);
         },
         handleResponseStatus() {
+          this.isWishlistRequestPending = false;
           if (event.detail.xhr.status === 429) {
             this.tooManyRequestsDialogOpened = true;
           } else if (event.detail.xhr.status === 413) {
